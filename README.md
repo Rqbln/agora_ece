@@ -71,9 +71,6 @@ Agora est un projet de forum web dynamique conçu pour valider les compétences 
 - **Connexion :** Page de connexion pour les utilisateurs existants.
 - **Inscription :** Page d'inscription pour les nouveaux utilisateurs.
 
-## Licence
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
 ## Auteurs
 - Robin Quériaux
 - Laouïg Eleouet
