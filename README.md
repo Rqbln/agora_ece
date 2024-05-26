@@ -1,6 +1,4 @@
-Voici le fichier README.md pour votre projet Agora :
 
-```markdown
 # Agora
 
 ## Description
@@ -64,33 +62,6 @@ Agora est un projet de forum web dynamique conçu pour valider les compétences 
     ```
     Ensuite, ouvrez votre navigateur et accédez à `http://localhost:8000`.
 
-## Structure du Projet
-```
-agora/
-├── assets/
-│   ├── css/
-│   │   └── styles.css
-│   ├── js/
-│   │   ├── scripts.js
-│   │   └── jquery.min.js
-│   ├── img/
-│   └── fonts/
-├── includes/
-│   ├── header.php
-│   ├── footer.php
-│   ├── navbar.php
-│   └── db.php
-├── pages/
-│   ├── home.php
-│   ├── forum.php
-│   ├── thread.php
-│   └── profile.php
-├── index.php
-├── login.php
-├── register.php
-├── .gitignore
-└── README.md
-```
 
 ## Fonctionnalités
 - **Accueil :** Page d'accueil du forum.
@@ -99,14 +70,6 @@ agora/
 - **Profil :** Page de profil utilisateur.
 - **Connexion :** Page de connexion pour les utilisateurs existants.
 - **Inscription :** Page d'inscription pour les nouveaux utilisateurs.
-
-## Contribuer
-Les contributions sont les bienvenues ! Veuillez suivre les étapes suivantes pour contribuer :
-1. Forkez le dépôt.
-2. Créez une branche pour votre fonctionnalité (`git checkout -b feature/nouvelle-fonctionnalité`).
-3. Commitez vos modifications (`git commit -am 'Ajoutez une nouvelle fonctionnalité'`).
-4. Poussez la branche (`git push origin feature/nouvelle-fonctionnalité`).
-5. Ouvrez une Pull Request.
 
 ## Licence
 Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
