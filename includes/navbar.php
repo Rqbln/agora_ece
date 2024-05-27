@@ -10,7 +10,8 @@
                 <li class="nav-item"><a class="nav-link" href="register.php">Inscription</a></li>
             </ul>
             <form class="d-flex">
-                <button class="btn btn-outline-dark" type="submit">
+                <button class="btn btn-outline-dark" type="submit" >
+                    <a class="nav-link" href ="../pages/cart.php">
                     <i class="bi-cart-fill me-1"></i>
                     Panier
                     <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
