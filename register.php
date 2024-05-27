@@ -36,42 +36,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .form-label {
             font-weight: bold;
             text-decoration: underline;
+            color: black;
             transition: color 0.3s;
         }
         .form-label:hover {
             color: #279191;
         }
+        .btn-custom {
+            background-color: #226565;
+            color: #ffffff;
+            border: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: black;
+            color: white;
+        }
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="text-center">Création d'un compte</h2>
-            <?php if (isset($success_message)): ?>
-                <div class="alert alert-success" role="alert">
-                    <?php echo $success_message; ?>
+<div class="wrapper">
+    <div class="content">
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <h2 class="text-center">Création d'un compte</h2>
+                    <?php if (isset($success_message)): ?>
+                        <div class="alert alert-success" role="alert">
+                            <?php echo $success_message; ?>
+                        </div>
+                    <?php elseif (isset($error_message)): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <?php echo $error_message; ?>
+                        </div>
+                    <?php endif; ?>
+                    <form method="post" action="register.php">
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">Nom:</label>
+                            <input type="text" id="nom" name="nom" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail:</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mot_de_passe" class="form-label">Mot de passe:</label>
+                            <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100 mb-5">S'inscrire</button>
+                    </form>
                 </div>
-            <?php elseif (isset($error_message)): ?>
-                <div class="alert alert-danger" role="alert">
-                    <?php echo $error_message; ?>
-                </div>
-            <?php endif; ?>
-            <form method="post" action="register.php">
-                <div class="mb-3">
-                    <label for="nom" class="form-label">Nom:</label>
-                    <input type="text" id="nom" name="nom" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">E-mail:</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="mot_de_passe" class="form-label">Mot de passe:</label>
-                    <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 mb-5">S'inscrire</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
