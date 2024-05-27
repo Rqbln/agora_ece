@@ -60,6 +60,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .content {
             flex: 1;
         }
+        .roleplay-message {
+            font-style: italic;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .roleplay-quote {
+            font-weight: bold;
+            color: #226565;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +80,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="row justify-content-center">
                 <div class="col-md-6">
                     <h2 class="text-center">Création d'un compte</h2>
+                    <p class="roleplay-message">
+                        Bienvenue, futur marchand d'Agora ! Préparez-vous à conquérir le marché et à négocier comme un pro.<br><span class="roleplay-quote">"Un bon vendeur sait quand parler, mais surtout quand écouter." - Maître Tortue</span>
+                    </p>
                     <?php if (isset($success_message)): ?>
                         <div class="alert alert-success" role="alert">
                             <?php echo $success_message; ?>
@@ -97,9 +111,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
+
+    <?php include 'includes/footer.php'; ?>
 </div>
-
-<?php include 'includes/footer.php'; ?>
-
 </body>
 </html>

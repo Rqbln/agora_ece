@@ -10856,3 +10856,24 @@ footer {
 footer p {
   margin: 0;
 }
+.nav-hover-effect {
+  position: relative;
+  display: inline-block;
+  transition: color 0.3s;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
+.nav-hover-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-radius: 0.25rem;
+  transition: border-color 0.8s;
+}
+
+.nav-hover-effect:hover::before {
+  border-color: black;
+}
+
