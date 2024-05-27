@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Agora Francia- Marketplace</title>
+    <title>Agora- Marketplace</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/img/logo_agora.png" />
     <!-- Bootstrap icons-->
