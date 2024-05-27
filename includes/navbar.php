@@ -5,7 +5,6 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.php">Accueil</a></li>
-                <li class="nav-item"><a class="nav-link" href="pages/forum.php">Forum</a></li>
                 <li class="nav-item"><a class="nav-link" href="pages/profile.php">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="login.php">Connexion</a></li>
                 <li class="nav-item"><a class="nav-link" href="register.php">Inscription</a></li>
