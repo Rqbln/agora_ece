@@ -1,14 +1,14 @@
 <?php
 $servername = "localhost";
-$username = "username";
-$password = "password";
-$dbname = "agora";
+$username = "root";
+$password = "fdex";
+$dbname = "agora_ece";
 
-// Create connection
+// Créer une connexion
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+// Vérifier la connexion
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Échec de la connexion : " . $conn->connect_error);
 }
 ?>
