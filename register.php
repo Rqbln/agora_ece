@@ -1,5 +1,7 @@
 <?php
 include 'includes/db.php';
+include 'includes/header.php';
+include 'includes/navbar.php';
 
 if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
@@ -14,9 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES ('$nom', '$email', '$mot_de_passe', '$role')";
 
     if ($conn->query($sql) === TRUE) {
-        echo "Inscription réussie.";
+        $success_message = "Inscription réussie.";
     } else {
-        echo "Erreur : " . $sql . "<br>" . $conn->error;
+        $error_message = "Erreur : " . $sql . "<br>" . $conn->error;
     }
 
     $conn->close();
@@ -29,16 +31,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        .form-label {
+            font-weight: bold;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+        .form-label:hover {
+            color: #279191;
+        }
+    </style>
 </head>
 <body>
-<form method="post" action="register.php">
-    <label for="nom">Nom:</label><br>
-    <input type="text" id="nom" name="nom" required><br>
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required><br>
-    <label for="mot_de_passe">Mot de passe:</label><br>
-    <input type="password" id="mot_de_passe" name="mot_de_passe" required><br><br>
-    <input type="submit" value="Register">
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center">Création d'un compte</h2>
+            <?php if (isset($success_message)): ?>
+                <div class="alert alert-success" role="alert">
+                    <?php echo $success_message; ?>
+                </div>
+            <?php elseif (isset($error_message)): ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php echo $error_message; ?>
+                </div>
+            <?php endif; ?>
+            <form method="post" action="register.php">
+                <div class="mb-3">
+                    <label for="nom" class="form-label">Nom:</label>
+                    <input type="text" id="nom" name="nom" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail:</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="mot_de_passe" class="form-label">Mot de passe:</label>
+                    <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-5">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
