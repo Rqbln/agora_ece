@@ -22,7 +22,7 @@ if (!$result) {
     <div class="container px-4 px-lg-5 my-5">
         <div class="text-center text-white">
             <h1 class="display-4 fw-bolder">Bienvenue sur Agora</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Participez aux discussions et partagez vos idées</p>
+            <p class="lead fw-normal text-white-50 mb-0">Bienvenue sur la marketplace préférée des électroniciens !</p>
         </div>
     </div>
 </header>
