@@ -2,9 +2,7 @@
 include 'includes/db.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
-
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -17,22 +15,25 @@ include 'includes/navbar.php';
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-4">
-            <h4>Importer une image</h4>
+            <h4>Importer des images</h4>
             <form id="imageForm" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="imageInput">Choisir une image</label>
-                    <input type="file" class="form-control-file" id="imageInput" name="image">
+                    <label for="imageInput" class="btn btn-primary">Importer des images</label>
+                    <input type="file" class="form-control-file d-none" id="imageInput" name="images[]" accept="image/*" multiple>
                 </div>
-                <button type="submit" class="btn btn-primary">Importer</button>
+                <div id="preview" class="mb-3"></div>
             </form>
             <?php
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
-                $targetDir = "uploads/";
-                $targetFile = $targetDir . basename($_FILES["image"]["name"]);
-                if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
-                    echo "<p>Image importée avec succès.</p>";
-                } else {
-                    echo "<p>Erreur lors de l'importation de l'image.</p>";
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['images'])) {
+                $totalFiles = count($_FILES['images']['name']);
+                for ($i = 0; $i < $totalFiles; $i++) {
+                    $targetDir = "uploads/";
+                    $targetFile = $targetDir . basename($_FILES["images"]["name"][$i]);
+                    if (move_uploaded_file($_FILES["images"]["tmp_name"][$i], $targetFile)) {
+                        echo "<p>Image " . ($i + 1) . " importée avec succès.</p>";
+                    } else {
+                        echo "<p>Erreur lors de l'importation de l'image " . ($i + 1) . ".</p>";
+                    }
                 }
             }
             ?>
@@ -69,6 +70,29 @@ include 'includes/navbar.php';
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    document.getElementById('imageInput').addEventListener('change', function(event) {
+        var preview = document.getElementById('preview');
+        preview.innerHTML = '';
+        var files = event.target.files;
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = (function(f) {
+                    return function(e) {
+                        var img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.maxWidth = '100%';
+                        img.style.height = 'auto';
+                        img.style.marginBottom = '10px';
+                        preview.appendChild(img);
+                    };
+                })(file);
+                reader.readAsDataURL(file);
+            }
+        }
+    });
+
     document.getElementById('adForm').addEventListener('submit', function(event) {
         event.preventDefault();
         alert('Formulaire soumis avec succès !');
