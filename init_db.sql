@@ -1,3 +1,6 @@
+-- Supprimer la base de données existante (attention, cela supprime toutes les données)
+DROP DATABASE IF EXISTS agora_ece;
+
 -- Création de la base de données
 CREATE DATABASE IF NOT EXISTS agora_ece;
 USE agora_ece;
@@ -18,6 +21,8 @@ CREATE TABLE IF NOT EXISTS produits (
     description TEXT,
     prix DECIMAL(10, 2) NOT NULL,
     image_url VARCHAR(255) NOT NULL,
+    video_url VARCHAR(255),
+    categorie ENUM('Meubles et objets d’art', 'Accessoire VIP', 'Matériels scolaires') NOT NULL,
     vendeur_id INT,
     FOREIGN KEY (vendeur_id) REFERENCES utilisateurs(id)
     );
@@ -26,11 +31,18 @@ CREATE TABLE IF NOT EXISTS produits (
 CREATE TABLE IF NOT EXISTS commandes (
                                          id INT AUTO_INCREMENT PRIMARY KEY,
                                          utilisateur_id INT,
-                                         produit_id INT,
-                                         quantite INT NOT NULL,
                                          date_commande DATETIME DEFAULT CURRENT_TIMESTAMP,
                                          status ENUM('en_attente', 'expedié', 'livré') DEFAULT 'en_attente',
-    FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id),
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id)
+    );
+
+-- Création de la table commande_produits pour gérer la relation many-to-many entre commandes et produits
+CREATE TABLE IF NOT EXISTS commande_produits (
+                                                 commande_id INT,
+                                                 produit_id INT,
+                                                 quantite INT NOT NULL,
+                                                 PRIMARY KEY (commande_id, produit_id),
+    FOREIGN KEY (commande_id) REFERENCES commandes(id),
     FOREIGN KEY (produit_id) REFERENCES produits(id)
     );
 
@@ -38,12 +50,34 @@ CREATE TABLE IF NOT EXISTS commandes (
 CREATE TABLE IF NOT EXISTS transactions (
                                             id INT AUTO_INCREMENT PRIMARY KEY,
                                             produit_id INT,
-                                            type ENUM('enchère', 'négociation'),
+                                            type ENUM('enchère', 'négociation') NOT NULL,
     montant DECIMAL(10, 2) NOT NULL,
     date_transaction DATETIME DEFAULT CURRENT_TIMESTAMP,
     utilisateur_id INT,
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id),
     FOREIGN KEY (produit_id) REFERENCES produits(id)
+    );
+
+-- Création de la table encheres
+CREATE TABLE IF NOT EXISTS encheres (
+                                        id INT AUTO_INCREMENT PRIMARY KEY,
+                                        produit_id INT,
+                                        utilisateur_id INT,
+                                        montant DECIMAL(10, 2) NOT NULL,
+    date_enchere DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id),
+    FOREIGN KEY (produit_id) REFERENCES produits(id)
+    );
+
+-- Création de la table paiements
+CREATE TABLE IF NOT EXISTS paiements (
+                                         id INT AUTO_INCREMENT PRIMARY KEY,
+                                         commande_id INT,
+                                         montant DECIMAL(10, 2) NOT NULL,
+    date_paiement DATETIME DEFAULT CURRENT_TIMESTAMP,
+    type ENUM('carte', 'paypal') NOT NULL,
+    statut ENUM('en_attente', 'complet') DEFAULT 'en_attente',
+    FOREIGN KEY (commande_id) REFERENCES commandes(id)
     );
 
 -- Insertion des données de test pour les utilisateurs
@@ -66,17 +100,32 @@ WHERE NOT EXISTS (
 ) LIMIT 1;
 
 -- Insertion des données de test pour les produits
-INSERT INTO produits (nom, description, prix, image_url, vendeur_id)
-SELECT 'Produit 1', 'Description du produit 1', 19.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', id
+INSERT INTO produits (nom, description, prix, image_url, categorie, vendeur_id)
+SELECT 'Chaise en bois', 'Chaise en bois massif, confortable et robuste.', 49.99, 'https://us.123rf.com/450wm/siraphol/siraphol1907/siraphol190706164/127832374-chaise-et-table-en-bois-vides-sur-un-patio-ext%C3%A9rieur-avec-une-belle-plage-tropicale-et-la-mer-au.jpg?ver=6', 'Meubles et objets d’art', id
 FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
 
-INSERT INTO produits (nom, description, prix, image_url, vendeur_id)
-SELECT 'Produit 2', 'Description du produit 2', 29.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', id
+INSERT INTO produits (nom, description, prix, image_url, categorie, vendeur_id)
+SELECT 'Montre de luxe', 'Montre en or 18 carats avec bracelet en cuir.', 4999.99, 'https://media.cdnws.com/_i/70772/63005/2754/5/montre-homme-or-dore.png', 'Accessoire VIP', id
 FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
 
-INSERT INTO produits (nom, description, prix, image_url, vendeur_id)
-SELECT 'Produit 3', 'Description du produit 3', 39.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', id
+INSERT INTO produits (nom, description, prix, image_url, categorie, vendeur_id)
+SELECT 'Ensemble de stylos', 'Ensemble de stylos de haute qualité pour l\'écriture et le dessin.', 29.99, 'https://ae01.alicdn.com/kf/HTB1VCEvXRKw3KVjSZTEq6AuRpXat.jpg_640x640Q90.jpg_.webp', 'Matériels scolaires', id
+FROM utilisateurs
+WHERE email = 'vendeur1@example.com';
+
+INSERT INTO produits (nom, description, prix, image_url, categorie, vendeur_id)
+SELECT 'Table en verre', 'Table basse en verre trempé avec pieds en acier.', 199.99, 'https://www.concept-usine.com/cdn/shop/files/Table-basse-design-Nula-Concept-Usine_x300.png?v=1709905707', 'Meubles et objets d’art', id
+FROM utilisateurs
+WHERE email = 'vendeur1@example.com';
+
+INSERT INTO produits (nom, description, prix, image_url, categorie, vendeur_id)
+SELECT 'Sac à main', 'Sac à main en cuir véritable de designer.', 999.99, 'https://m.media-amazon.com/images/I/71WkWDk-0LL._AC_UY300_.jpg', 'Accessoire VIP', id
+FROM utilisateurs
+WHERE email = 'vendeur1@example.com';
+
+INSERT INTO produits (nom, description, prix, image_url, categorie, vendeur_id)
+SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', 'Matériels scolaires', id
 FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
