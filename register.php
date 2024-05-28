@@ -20,13 +20,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mot_de_passe = password_hash($_POST['mot_de_passe'], PASSWORD_DEFAULT);
     $role = 'acheteur'; // Par défaut
 
-    $sql = "INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES ('$nom', '$email', '$mot_de_passe', '$role')";
+    // Vérifier si un compte avec cet email existe déjà
+    $sql_check = "SELECT * FROM utilisateurs WHERE email='$email'";
+    $result_check = $conn->query($sql_check);
 
-    if ($conn->query($sql) === TRUE) {
-        header("Location: login.php?success=1");
-        exit();
+    if ($result_check->num_rows > 0) {
+        $error_message = "Un compte avec cet e-mail existe déjà.";
     } else {
-        $error_message = "Erreur : " . $sql . "<br>" . $conn->error;
+        $sql = "INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES ('$nom', '$email', '$mot_de_passe', '$role')";
+
+        if ($conn->query($sql) === TRUE) {
+            header("Location: login.php?success=1");
+            exit();
+        } else {
+            $error_message = "Erreur : " . $sql . "<br>" . $conn->error;
+        }
     }
 
     $conn->close();
