@@ -1,5 +1,7 @@
 <?php
 include '../includes/db.php';
+include '../includes/header.php';
+include '../includes/navbar.php';
 session_start();
 
 if (!isset($conn)) {
@@ -47,33 +49,55 @@ if (count($_SESSION['cart']) > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panier</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .cart-container {
+            margin-top: 50px;
+        }
+        .cart-item {
+            margin-bottom: 20px;
+        }
+        .card img {
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
-<h1>Votre Panier</h1>
-<a href="../index.php">Accueil</a>
-<a href="profile.php">Profil</a>
-<div class="container">
-    <div class="row">
-        <?php
-        if (count($items) > 0) {
-            foreach ($items as $item) {
-                echo '<div class="col-md-4">';
-                echo '<div class="card">';
-                echo '<img src="' . $item['image_url'] . '" class="card-img-top" alt="' . $item['nom'] . '">';
-                echo '<div class="card-body">';
-                echo '<h5 class="card-title">' . $item['nom'] . '</h5>';
-                echo '<p class="card-text">' . $item['description'] . '</p>';
-                echo '<p class="card-text">Prix: ' . $item['prix'] . ' €</p>';
-                echo '<a href="cart.php?action=remove&id=' . $item['id'] . '" class="btn btn-danger">Retirer</a>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            }
-        } else {
-            echo "Votre panier est vide.";
-        }
-        ?>
+<div class="wrapper">
+    <div class="content">
+        <div class="container cart-container">
+            <h2 class="text-center">Votre Panier</h2>
+            <div class="row">
+                <?php
+                if (count($items) > 0) {
+                    foreach ($items as $item) {
+                        echo '<div class="col-md-4 cart-item">';
+                        echo '<div class="card">';
+                        echo '<img src="' . $item['image_url'] . '" class="card-img-top" alt="' . $item['nom'] . '">';
+                        echo '<div class="card-body">';
+                        echo '<h5 class="card-title">' . $item['nom'] . '</h5>';
+                        echo '<p class="card-text">' . $item['description'] . '</p>';
+                        echo '<p class="card-text">Prix: ' . $item['prix'] . ' €</p>';
+                        echo '<a href="cart.php?action=remove&id=' . $item['id'] . '" class="btn btn-danger">Retirer</a>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                } else {
+                    echo "<div class='col-12 text-center'>Votre panier est vide.</div>";
+                }
+                ?>
+            </div>
+        </div>
     </div>
+    <?php include '../includes/footer.php'; ?>
 </div>
 </body>
 </html>
