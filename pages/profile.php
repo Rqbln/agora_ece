@@ -41,14 +41,16 @@ if ($result->num_rows > 0) {
 
 <div class="container mt-5">
     <h1 class="mb-4">Profil</h1>
-    <a href="home.php" class="btn btn-secondary mb-4">Accueil</a>
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Nom: <?php echo $row['nom']; ?></h5>
-            <p class="card-text">Email: <?php echo $row['email']; ?></p>
+            <h5 class="card-title">Nom: <?php echo htmlspecialchars($row['nom']); ?></h5>
+            <p class="card-text">Email: <?php echo htmlspecialchars($row['email']); ?></p>
             <a href="update_profile.php" class="btn btn-primary">Mettre à jour les infos</a>
         </div>
     </div>
+    <form action="/agora_ece/logout.php" method="post" class="mt-3">
+        <button type="submit" class="btn btn-danger">Déconnexion</button>
+    </form>
 </div>
 
 <!-- Bootstrap core JS -->

@@ -5,6 +5,11 @@ include 'includes/navbar.php';
 
 session_start();
 
+if (isset($_SESSION['user_id'])) {
+    header("Location: pages/profile.php");
+    exit();
+}
+
 if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
 }
@@ -26,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['user_nom'] = $row['nom'];
             header("Location: pages/profile.php");
+            exit();
         } else {
             $error_message = "Mot de passe incorrect.";
         }
@@ -71,6 +77,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .content {
             flex: 1;
         }
+        .register-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -96,6 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <button type="submit" class="btn btn-custom w-100 mb-5">Se connecter</button>
                     </form>
+                    <p class="register-link">Pas de compte ? <a href="register.php">Inscrivez-vous</a></p>
                 </div>
             </div>
         </div>

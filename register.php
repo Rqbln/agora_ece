@@ -3,6 +3,13 @@ include 'includes/db.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+    header("Location: pages/profile.php");
+    exit();
+}
+
 if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
 }
