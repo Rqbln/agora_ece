@@ -13,19 +13,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nom = $_POST['nom'];
-    $email = $_POST['email'];
-
-    $sql = "UPDATE utilisateurs SET nom='$nom', email='$email' WHERE id='$user_id'";
-
-    if ($conn->query($sql) === TRUE) {
-        echo "Profil mis à jour avec succès.";
-    } else {
-        echo "Erreur lors de la mise à jour du profil : " . $conn->error;
-    }
-}
-
 $sql = "SELECT * FROM utilisateurs WHERE id='$user_id'";
 $result = $conn->query($sql);
 
@@ -36,7 +23,7 @@ if (!$result) {
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 } else {
-    echo "Utilisateur non trouvé.";
+    echo "<div class='alert alert-danger' role='alert'>Utilisateur non trouvé.</div>";
     exit();
 }
 ?>
@@ -47,17 +34,26 @@ if ($result->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
-    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<h1>Profil</h1>
-<a href="home.php">Accueil</a>
-<form method="post" action="profile.php">
-    <label for="nom">Nom:</label><br>
-    <input type="text" id="nom" name="nom" value="<?php echo $row['nom']; ?>" required><br>
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" value="<?php echo $row['email']; ?>" required><br><br>
-    <input type="submit" value="Mettre à jour">
-</form>
+<?php include '../includes/navbar.php'; ?>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Profil</h1>
+    <a href="home.php" class="btn btn-secondary mb-4">Accueil</a>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Nom: <?php echo $row['nom']; ?></h5>
+            <p class="card-text">Email: <?php echo $row['email']; ?></p>
+            <a href="update_profile.php" class="btn btn-primary">Mettre à jour les infos</a>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

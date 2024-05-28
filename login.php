@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($mot_de_passe, $row['mot_de_passe'])) {
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['user_nom'] = $row['nom'];
-            header("Location: pages/forum.php");
+            header("Location: pages/profile.php");
         } else {
             $error_message = "Mot de passe incorrect.";
         }

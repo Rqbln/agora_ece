@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="index.php">
+        <a class="navbar-brand" href="/agora_ece/index.php">
             <img src="/agora_ece/assets/img/logo_agora.png" alt="Logo" style="height: 80px; margin-right: 10px;">
             Agora
         </a>
