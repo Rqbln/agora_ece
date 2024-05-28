@@ -32,13 +32,13 @@ function getTypeDeVente($type) {
 function getActionButton($type, $id) {
     switch ($type) {
         case 'vente_immediate':
-            return '<a class="btn btn-outline-dark mt-auto" href="item.php?id=' . $id . '">Acheter maintenant</a>';
+            return '<a class="btn btn-outline-dark mt-auto" href="pages/payment.php?id=' . $id . '">Acheter maintenant</a>';
         case 'vente_negociation':
-            return '<a class="btn btn-outline-dark mt-auto" href="item.php?id=' . $id . '">Négocier le prix</a>';
+            return '<a class="btn btn-outline-dark mt-auto" href="pages/item.php?id=' . $id . '">Négocier le prix</a>';
         case 'vente_meilleure_offre':
-            return '<a class="btn btn-outline-dark mt-auto" href="item.php?id=' . $id . '">Faire une offre</a>';
+            return '<a class="btn btn-outline-dark mt-auto" href="pages/item.php?id=' . $id . '">Faire une offre</a>';
         default:
-            return '<a class="btn btn-outline-dark mt-auto" href="item.php?id=' . $id . '">Voir les détails</a>';
+            return '<a class="btn btn-outline-dark mt-auto" href="pages/item.php?id=' . $id . '">Voir les détails</a>';
     }
 }
 ?>
@@ -70,26 +70,12 @@ function getActionButton($type, $id) {
             align-items: center; /* Vertically center the row contents */
         }
         .vente-type {
-            background-color: rgba(39, 145, 145, 0.38);
-            color: #226565;
+            background-color: #ffdddd;
+            border: 1px solid #ff0000;
             padding: 5px;
             border-radius: 5px;
             margin-bottom: 10px;
             text-align: center;
-            font-weight: bold;
-        }
-        .card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-        }
-        .card-body {
-            flex: 1;
-        }
-        .card-footer {
-            display: flex;
-            flex-direction: column;
         }
     </style>
 </head>
@@ -121,11 +107,11 @@ function getActionButton($type, $id) {
                     echo '<p class="text-muted">' . $row['categorie'] . '</p>';
                     echo '<p>' . $row['description'] . '</p>';
                     echo '<h5>' . $row['prix'] . ' €</h5>';
+                    echo '<div class="vente-type">' . getTypeDeVente($row['type_de_vente']) . '</div>';
+                    echo getActionButton($row['type_de_vente'], $row['id']);
                     echo '</div>';
                     echo '</div>';
                     echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
-                    echo '<div class="vente-type">' . getTypeDeVente($row['type_de_vente']) . '</div>';
-                    echo getActionButton($row['type_de_vente'], $row['id']);
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -157,6 +143,7 @@ function getActionButton($type, $id) {
         </div>
     </div>
 </div>
+
 
 </body>
 </html>

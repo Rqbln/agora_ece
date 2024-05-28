@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS produits (
                                         video_url VARCHAR(255),
                                         categorie ENUM('Meubles et objets d’art', 'Accessoire VIP', 'Matériels scolaires') NOT NULL,
                                         type_de_vente ENUM('vente_immediate', 'vente_negociation', 'vente_meilleure_offre') NOT NULL,
+                                        vendu BOOLEAN DEFAULT FALSE,
                                         vendeur_id INT,
                                         FOREIGN KEY (vendeur_id) REFERENCES utilisateurs(id)
 );
@@ -98,6 +99,16 @@ CREATE TABLE IF NOT EXISTS panier_produits (
                                                FOREIGN KEY (produit_id) REFERENCES produits(id)
 );
 
+-- Ajout de la table cartes_credit pour les informations de carte de crédit
+CREATE TABLE IF NOT EXISTS cartes_credit (
+                                             id INT AUTO_INCREMENT PRIMARY KEY,
+                                             numero_carte VARCHAR(16) NOT NULL,
+                                             date_expiration DATE NOT NULL,
+                                             cvv VARCHAR(4) NOT NULL,
+                                             utilisateur_id INT,
+                                             FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id)
+);
+
 -- Insertion des données de test pour les utilisateurs
 INSERT INTO utilisateurs (nom, email, mot_de_passe, role)
 SELECT * FROM (SELECT 'Admin', 'admin@example.com', 'admin123', 'administrateur') AS tmp
@@ -147,3 +158,9 @@ INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vent
 SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', 'Matériels scolaires', 'vente_immediate', id
 FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
+
+-- Insertion d'une carte de crédit fictive
+INSERT INTO cartes_credit (numero_carte, date_expiration, cvv, utilisateur_id)
+SELECT '1234567812345678', '31/12/2025', '123', id
+FROM utilisateurs
+WHERE email = 'txrtxe@gmail.com';

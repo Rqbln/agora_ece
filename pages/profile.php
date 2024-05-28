@@ -24,7 +24,6 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 } else {
     echo "<div class='alert alert-danger' role='alert'>Utilisateur non trouvé.</div>";
-    exit();
 }
 ?>
 
