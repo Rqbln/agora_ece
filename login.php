@@ -91,6 +91,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="row justify-content-center">
                 <div class="col-md-6">
                     <h2 class="text-center">Connexion à votre compte</h2>
+                    <?php if (isset($_GET['success'])): ?>
+                        <div class="alert alert-success" role="alert">
+                            Inscription réussie. Vous pouvez maintenant vous connecter.
+                        </div>
+                    <?php endif; ?>
                     <?php if (isset($error_message)): ?>
                         <div class="alert alert-danger" role="alert">
                             <?php echo $error_message; ?>

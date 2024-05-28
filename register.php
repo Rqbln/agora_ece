@@ -23,7 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES ('$nom', '$email', '$mot_de_passe', '$role')";
 
     if ($conn->query($sql) === TRUE) {
-        $success_message = "Inscription réussie.";
+        header("Location: login.php?success=1");
+        exit();
     } else {
         $error_message = "Erreur : " . $sql . "<br>" . $conn->error;
     }
@@ -90,11 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <p class="roleplay-message">
                         Bienvenue, futur marchand d'Agora ! Préparez-vous à conquérir le marché et à négocier comme un pro.<br><span class="roleplay-quote">"Un bon vendeur sait quand parler, mais surtout quand écouter." - Maître Tortue</span>
                     </p>
-                    <?php if (isset($success_message)): ?>
-                        <div class="alert alert-success" role="alert">
-                            <?php echo $success_message; ?>
-                        </div>
-                    <?php elseif (isset($error_message)): ?>
+                    <?php if (isset($error_message)): ?>
                         <div class="alert alert-danger" role="alert">
                             <?php echo $error_message; ?>
                         </div>
