@@ -34,28 +34,27 @@ if ($result->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
-<?php include '../includes/navbar.php'; ?>
-
-<div class="container mt-5">
-    <h1 class="mb-4">Profil</h1>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Nom: <?php echo htmlspecialchars($row['nom']); ?></h5>
-            <p class="card-text">Email: <?php echo htmlspecialchars($row['email']); ?></p>
-            <a href="update_profile.php" class="btn btn-primary">Mettre à jour les infos</a>
+<div class="wrapper">
+    <div class="content">
+        <?php include '../includes/navbar.php'; ?>
+        <div class="container mt-5">
+            <h1 class="mb-4">Profil</h1>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Nom: <?php echo htmlspecialchars($row['nom']); ?></h5>
+                    <p class="card-text">Email: <?php echo htmlspecialchars($row['email']); ?></p>
+                    <a href="update_profile.php" class="btn btn-primary">Mettre à jour les infos</a>
+                </div>
+            </div>
+            <form action="/agora_ece/logout.php" method="post" class="mt-3">
+                <button type="submit" class="btn btn-danger">Déconnexion</button>
+            </form>
         </div>
     </div>
-    <form action="/agora_ece/logout.php" method="post" class="mt-3">
-        <button type="submit" class="btn btn-danger">Déconnexion</button>
-    </form>
+    <?php include '../includes/footer.php'; ?>
 </div>
-
-<!-- Bootstrap core JS -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

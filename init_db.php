@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "admin";
+$password = "txrtxe";
 $dbname = "agora_ece";
 
 // Créer une connexion
