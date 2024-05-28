@@ -1,5 +1,5 @@
 <?php
-include './includes/db.php';
+include '../includes/db.php';
 session_start();
 
 if (!isset($conn)) {
@@ -50,7 +50,7 @@ if (count($_SESSION['cart']) > 0) {
 </head>
 <body>
 <h1>Votre Panier</h1>
-<a href="home.php">Accueil</a>
+<a href="../index.php">Accueil</a>
 <a href="profile.php">Profil</a>
 <div class="container">
     <div class="row">
