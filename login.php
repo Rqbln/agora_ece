@@ -3,22 +3,34 @@ include 'includes/db.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
+session_start();
+
 if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nom = $_POST['nom'];
     $email = $_POST['email'];
-    $mot_de_passe = password_hash($_POST['mot_de_passe'], PASSWORD_DEFAULT);
-    $role = 'acheteur'; // Par défaut
+    $mot_de_passe = $_POST['mot_de_passe'];
 
-    $sql = "INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES ('$nom', '$email', '$mot_de_passe', '$role')";
+    $sql = "SELECT * FROM utilisateurs WHERE email='$email'";
+    $result = $conn->query($sql);
 
-    if ($conn->query($sql) === TRUE) {
-        $success_message = "Inscription réussie.";
+    if (!$result) {
+        die("Erreur lors de l'exécution de la requête : " . $conn->error);
+    }
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        if (password_verify($mot_de_passe, $row['mot_de_passe'])) {
+            $_SESSION['user_id'] = $row['id'];
+            $_SESSION['user_nom'] = $row['nom'];
+            header("Location: pages/forum.php");
+        } else {
+            $error_message = "Mot de passe incorrect.";
+        }
     } else {
-        $error_message = "Erreur : " . $sql . "<br>" . $conn->error;
+        $error_message = "Aucun utilisateur trouvé avec cet email.";
     }
 
     $conn->close();
@@ -30,20 +42,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>Login</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <style>
         .form-label {
             font-weight: bold;
             text-decoration: underline;
-            color: black;
             transition: color 0.3s;
         }
         .form-label:hover {
             color: #279191;
         }
         .btn-custom {
-            background-color: #226565;
+            background-color: #2d6c59;
             color: #ffffff;
             border: none;
             transition: background-color 0.3s, color 0.3s;
@@ -68,21 +79,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="container mt-5">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <h2 class="text-center">Création d'un compte</h2>
-                    <?php if (isset($success_message)): ?>
-                        <div class="alert alert-success" role="alert">
-                            <?php echo $success_message; ?>
-                        </div>
-                    <?php elseif (isset($error_message)): ?>
+                    <h2 class="text-center">Connexion à votre compte</h2>
+                    <?php if (isset($error_message)): ?>
                         <div class="alert alert-danger" role="alert">
                             <?php echo $error_message; ?>
                         </div>
                     <?php endif; ?>
-                    <form method="post" action="register.php">
-                        <div class="mb-3">
-                            <label for="nom" class="form-label">Nom:</label>
-                            <input type="text" id="nom" name="nom" class="form-control" required>
-                        </div>
+                    <form method="post" action="login.php">
                         <div class="mb-3">
                             <label for="email" class="form-label">E-mail:</label>
                             <input type="email" id="email" name="email" class="form-control" required>
@@ -91,13 +94,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <label for="mot_de_passe" class="form-label">Mot de passe:</label>
                             <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-custom w-100 mb-5">S'inscrire</button>
+                        <button type="submit" class="btn btn-custom w-100 mb-5">Se connecter</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
     <?php include 'includes/footer.php'; ?>
 </div>
 </body>
