@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "fdex";
+$password = "admin";
 $dbname = "agora_ece";
 
 // Créer une connexion
