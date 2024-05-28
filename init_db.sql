@@ -80,6 +80,23 @@ CREATE TABLE IF NOT EXISTS paiements (
     FOREIGN KEY (commande_id) REFERENCES commandes(id)
     );
 
+-- Ajout de la table paniers pour les acheteurs
+CREATE TABLE IF NOT EXISTS paniers (
+                                       id INT AUTO_INCREMENT PRIMARY KEY,
+                                       utilisateur_id INT,
+                                       FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id)
+);
+
+-- Ajout de la table panier_produits pour gérer la relation many-to-many entre paniers et produits
+CREATE TABLE IF NOT EXISTS panier_produits (
+                                               panier_id INT,
+                                               produit_id INT,
+                                               quantite INT NOT NULL,
+                                               PRIMARY KEY (panier_id, produit_id),
+                                               FOREIGN KEY (panier_id) REFERENCES paniers(id),
+                                               FOREIGN KEY (produit_id) REFERENCES produits(id)
+);
+
 -- Insertion des données de test pour les utilisateurs
 INSERT INTO utilisateurs (nom, email, mot_de_passe, role)
 SELECT * FROM (SELECT 'Admin', 'admin@example.com', 'admin123', 'administrateur') AS tmp
@@ -129,3 +146,4 @@ INSERT INTO produits (nom, description, prix, image_url, categorie, vendeur_id)
 SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', 'Matériels scolaires', id
 FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
+
