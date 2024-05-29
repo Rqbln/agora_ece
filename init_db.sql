@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS encheres (
                                         FOREIGN KEY (produit_id) REFERENCES produits(id)
 );
 
+
 -- Création de la table paiements
 CREATE TABLE IF NOT EXISTS paiements (
                                          id INT AUTO_INCREMENT PRIMARY KEY,
