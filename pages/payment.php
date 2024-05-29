@@ -48,42 +48,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         // Carte de crédit valide
-        // Créer une commande
-        $sql_commande = "INSERT INTO commandes (utilisateur_id, status) VALUES ('$user_id', 'en_attente')";
-        if ($conn->query($sql_commande) === TRUE) {
-            $commande_id = $conn->insert_id;
 
-            // Ajouter le produit à la commande
-            $sql_commande_produit = "INSERT INTO commande_produits (commande_id, produit_id, quantite) VALUES ('$commande_id', '$produit_id', 1)";
-            if ($conn->query($sql_commande_produit) === TRUE) {
+        // Vérifier si l'utilisateur existe
+        $sql_user_check = "SELECT * FROM utilisateurs WHERE id='$user_id'";
+        $result_user_check = $conn->query($sql_user_check);
 
-                // Enregistrer le paiement
-                $sql_paiement = "INSERT INTO paiements (commande_id, montant, type, statut) VALUES ('$commande_id', '$prix_total_ttc', 'carte', 'complet')";
-                if ($conn->query($sql_paiement) === TRUE) {
+        if ($result_user_check->num_rows > 0) {
+            // Créer une commande
+            $sql_commande = "INSERT INTO commandes (utilisateur_id, status) VALUES ('$user_id', 'en_attente')";
+            if ($conn->query($sql_commande) === TRUE) {
+                $commande_id = $conn->insert_id;
 
-                    // Obtenir l'email de l'utilisateur
-                    $sql_email = "SELECT email FROM utilisateurs WHERE id='$user_id'";
-                    $result_email = $conn->query($sql_email);
-                    $email = '';
-                    if ($result_email->num_rows > 0) {
-                        $email = $result_email->fetch_assoc()['email'];
-                    }
+                // Ajouter le produit à la commande
+                $sql_commande_produit = "INSERT INTO commande_produits (commande_id, produit_id, quantite) VALUES ('$commande_id', '$produit_id', 1)";
+                if ($conn->query($sql_commande_produit) === TRUE) {
 
-                    // Mettre à jour le produit comme vendu et attribuer l'email de l'acheteur
-                    $sql_update_produit = "UPDATE produits SET vendu=1, acheteur_email='$email' WHERE id='$produit_id'";
-                    if ($conn->query($sql_update_produit) === TRUE) {
-                        $message = "<div class='alert alert-success' role='alert'>Paiement réussi. Votre commande a été passée.</div>";
+                    // Enregistrer le paiement
+                    $sql_paiement = "INSERT INTO paiements (commande_id, montant, type, statut) VALUES ('$commande_id', '$prix_total_ttc', 'carte', 'complet')";
+                    if ($conn->query($sql_paiement) === TRUE) {
+
+                        // Obtenir l'email de l'utilisateur
+                        $sql_email = "SELECT email FROM utilisateurs WHERE id='$user_id'";
+                        $result_email = $conn->query($sql_email);
+                        $email = '';
+                        if ($result_email->num_rows > 0) {
+                            $email = $result_email->fetch_assoc()['email'];
+                        }
+
+                        // Mettre à jour le produit comme vendu et attribuer l'email de l'acheteur
+                        $sql_update_produit = "UPDATE produits SET vendu=1, acheteur_email='$email' WHERE id='$produit_id'";
+                        if ($conn->query($sql_update_produit) === TRUE) {
+                            $message = "<div class='alert alert-success' role='alert'>Paiement réussi. Votre commande a été passée.</div>";
+                        } else {
+                            $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la mise à jour du produit : " . $conn->error . "</div>";
+                        }
                     } else {
-                        $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la mise à jour du produit : " . $conn->error . "</div>";
+                        $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement du paiement : " . $conn->error . "</div>";
                     }
                 } else {
-                    $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement du paiement : " . $conn->error . "</div>";
+                    $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'ajout du produit à la commande : " . $conn->error . "</div>";
                 }
             } else {
-                $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'ajout du produit à la commande : " . $conn->error . "</div>";
+                $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la création de la commande : " . $conn->error . "</div>";
             }
         } else {
-            $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la création de la commande : " . $conn->error . "</div>";
+            $message = "<div class='alert alert-danger' role='alert'>Utilisateur non trouvé. ID: " . $user_id . "</div>";
         }
     } else {
         // Carte de crédit non valide
