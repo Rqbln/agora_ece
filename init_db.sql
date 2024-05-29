@@ -104,9 +104,7 @@ CREATE TABLE IF NOT EXISTS cartes_credit (
                                              id INT AUTO_INCREMENT PRIMARY KEY,
                                              numero_carte VARCHAR(16) NOT NULL,
                                              date_expiration DATE NOT NULL,
-                                             cvv VARCHAR(4) NOT NULL,
-                                             utilisateur_id INT,
-                                             FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id)
+                                             cvv VARCHAR(4) NOT NULL
 );
 
 -- Insertion des données de test pour les utilisateurs
@@ -160,7 +158,5 @@ FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
 
 -- Insertion d'une carte de crédit fictive
-INSERT INTO cartes_credit (numero_carte, date_expiration, cvv, utilisateur_id)
-SELECT '1234567812345678', '31/12/2025', '123', id
-FROM utilisateurs
-WHERE email = 'txrtxe@gmail.com';
+INSERT INTO cartes_credit (numero_carte, date_expiration, cvv)
+SELECT '1234567812345678', '2025-15-31', '123'
