@@ -23,20 +23,6 @@ include 'includes/navbar.php';
                 </div>
                 <div id="preview" class="mb-3"></div>
             </form>
-            <?php
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['images'])) {
-                $totalFiles = count($_FILES['images']['name']);
-                for ($i = 0; $i < $totalFiles; $i++) {
-                    $targetDir = "uploads/";
-                    $targetFile = $targetDir . basename($_FILES["images"]["name"][$i]);
-                    if (move_uploaded_file($_FILES["images"]["tmp_name"][$i], $targetFile)) {
-                        echo "<p>Image " . ($i + 1) . " importée avec succès.</p>";
-                    } else {
-                        echo "<p>Erreur lors de l'importation de l'image " . ($i + 1) . ".</p>";
-                    }
-                }
-            }
-            ?>
         </div>
         <div class="col-md-8">
             <form id="adForm" method="POST" action="submit_ad.php">
@@ -50,15 +36,24 @@ include 'includes/navbar.php';
                 </div>
                 <div class="form-group">
                     <label for="price">Prix</label>
-                    <input type="number" class="form-control" id="price" name="price" required>
+                    <input type="number" step="0.01" class="form-control" id="price" name="price" required>
                 </div>
                 <div class="form-group">
                     <label for="saleType">Type de vente</label>
                     <select class="form-control" id="saleType" name="saleType" required>
                         <option value="">Choisir...</option>
-                        <option value="direct">Vente directe</option>
-                        <option value="negotiation">Négociation</option>
-                        <option value="auction">Enchère</option>
+                        <option value="vente_immediate">Vente immédiate</option>
+                        <option value="vente_negociation">Vente par négociation</option>
+                        <option value="vente_meilleure_offre">Vente à la meilleure offre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="category">Catégorie</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <option value="">Choisir...</option>
+                        <option value="Meubles et objets d’art">Meubles et objets d’art</option>
+                        <option value="Accessoire VIP">Accessoire VIP</option>
+                        <option value="Matériels scolaires">Matériels scolaires</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-success">Soumettre</button>
@@ -80,7 +75,7 @@ include 'includes/navbar.php';
                 var reader = new FileReader();
                 reader.onload = (function(f) {
                     return function(e) {
-                        var img = document.createElement('img');
+                        var img = document.createElement('img_url');
                         img.src = e.target.result;
                         img.style.maxWidth = '100%';
                         img.style.height = 'auto';
@@ -91,11 +86,6 @@ include 'includes/navbar.php';
                 reader.readAsDataURL(file);
             }
         }
-    });
-
-    document.getElementById('adForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        alert('Formulaire soumis avec succès !');
     });
 </script>
 </body>
