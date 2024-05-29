@@ -10,6 +10,9 @@
                 <li class="nav-item"><a class="nav-link nav-hover-effect" href="/agora_ece/login.php">Connexion / S'inscrire</a></li>
                 <li class="nav-item"><a class="nav-link nav-hover-effect" href="/agora_ece/pages/negotiations.php">Négociations et Offres en cours</a></li>
             </ul>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link nav-hover-effect" href="/agora_ece/sale.php">Ajouter un article</a></li>
+            </ul>
             <form class="d-flex">
                 <button class="btn btn-outline-dark me-2" type="button">
                     <a class="nav-link" href="/agora_ece/pages/cart.php">
