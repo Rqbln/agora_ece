@@ -29,6 +29,18 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $row['nom']; ?></title>
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .negotiation-form {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function showNegotiationForm() {
+            document.getElementById('negotiation-form').style.display = 'block';
+            document.getElementById('negotiate-button').style.display = 'none';
+        }
+    </script>
 </head>
 <body>
 <h1><?php echo $row['nom']; ?></h1>
@@ -36,5 +48,19 @@ if ($result->num_rows > 0) {
 <p><?php echo $row['description']; ?></p>
 <p>Prix: <?php echo $row['prix']; ?> €</p>
 <a href="cart.php?action=add&id=<?php echo $row['id']; ?>" class="btn btn-primary">Ajouter au panier</a>
+
+<!-- Bouton Négocier le prix -->
+<button id="negotiate-button" class="btn btn-secondary" onclick="showNegotiationForm()">Négocier le prix</button>
+
+<!-- Formulaire de négociation -->
+<div id="negotiation-form" class="negotiation-form">
+    <form action="submit_negotiation.php" method="post">
+        <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
+        <label for="offer">Votre offre (€):</label>
+        <input type="number" id="offer" name="offer" required>
+        <button type="submit" class="btn btn-success">Soumettre l'offre</button>
+    </form>
+    <button onclick="location.reload();" class="btn btn-danger">Annuler</button>
+</div>
 </body>
 </html>
