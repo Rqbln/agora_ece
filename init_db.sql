@@ -14,17 +14,6 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
                                             role ENUM('acheteur', 'vendeur', 'administrateur') NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS offres (
-                                      id INT AUTO_INCREMENT PRIMARY KEY,
-                                      produit_id INT,
-                                      utilisateur_id INT,
-                                      montant DECIMAL(10, 2) NOT NULL,
-                                      date_offre DATETIME DEFAULT CURRENT_TIMESTAMP,
-                                      FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id),
-                                      FOREIGN KEY (produit_id) REFERENCES produits(id)
-);
-
-
 -- Création de la table produits
 CREATE TABLE IF NOT EXISTS produits (
                                         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -83,7 +72,6 @@ CREATE TABLE IF NOT EXISTS encheres (
                                         FOREIGN KEY (produit_id) REFERENCES produits(id)
 );
 
-
 -- Création de la table paiements
 CREATE TABLE IF NOT EXISTS paiements (
                                          id INT AUTO_INCREMENT PRIMARY KEY,
@@ -128,6 +116,16 @@ CREATE TABLE IF NOT EXISTS demandes_vendeur (
                                                 FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id)
 );
 
+-- Création de la table offres
+CREATE TABLE IF NOT EXISTS offres (
+                                      id INT AUTO_INCREMENT PRIMARY KEY,
+                                      produit_id INT,
+                                      utilisateur_id INT,
+                                      montant DECIMAL(10, 2) NOT NULL,
+                                      date_offre DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                      FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id),
+                                      FOREIGN KEY (produit_id) REFERENCES produits(id)
+);
 
 -- Insertion des données de test pour les utilisateurs avec des mots de passe hachés
 INSERT INTO utilisateurs (nom, email, mot_de_passe, role)
