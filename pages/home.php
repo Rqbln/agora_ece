@@ -9,7 +9,7 @@ if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
 }
 
-$sql = "SELECT * FROM produits";
+$sql = "SELECT * FROM produits WHERE vendu = 0"; // Modify the query to include vendu = 0
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -32,13 +32,13 @@ function getTypeDeVente($type) {
 function getActionButton($type, $id) {
     switch ($type) {
         case 'vente_immediate':
-            return '<a class="btn btn-outline-dark mt-auto" href="pages/payment.php?id=' . $id . '">Acheter maintenant</a>';
+            return '<a class="btn btn-outline-dark w-100 mt-auto" href="pages/payment.php?id=' . $id . '">Acheter maintenant</a>';
         case 'vente_negociation':
-            return '<a class="btn btn-outline-dark mt-auto" href="pages/item.php?id=' . $id . '">Négocier le prix</a>';
+            return '<a class="btn btn-outline-dark w-100 mt-auto" href="pages/item.php?id=' . $id . '">Négocier le prix</a>';
         case 'vente_meilleure_offre':
-            return '<a class="btn btn-outline-dark mt-auto" href="pages/item.php?id=' . $id . '">Faire une offre</a>';
+            return '<a class="btn btn-outline-dark w-100 mt-auto" href="pages/item.php?id=' . $id . '">Faire une offre</a>';
         default:
-            return '<a class="btn btn-outline-dark mt-auto" href="pages/item.php?id=' . $id . '">Voir les détails</a>';
+            return '<a class="btn btn-outline-dark w-100 mt-auto" href="pages/item.php?id=' . $id . '">Voir les détails</a>';
     }
 }
 ?>
@@ -67,15 +67,27 @@ function getActionButton($type, $id) {
             height: 100%;
         }
         .contact-info .row {
-            align-items: center; /* Vertically center the row contents */
+            align-items: center;
         }
         .vente-type {
-            background-color: #ffdddd;
-            border: 1px solid #ff0000;
+            background-color: rgba(129, 205, 205, 0.63);
+            border: 1px solid #81cdcd;
             padding: 5px;
             border-radius: 5px;
-            margin-bottom: 10px;
             text-align: center;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-footer {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .bottom-aligned {
+            margin-top: auto;
         }
     </style>
 </head>
@@ -101,13 +113,15 @@ function getActionButton($type, $id) {
                     echo '<div class="col mb-5">';
                     echo '<div class="card h-100">';
                     echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
-                    echo '<div class="card-body p-4">';
-                    echo '<div class="text-center">';
+                    echo '<div class="card-body p-4 d-flex flex-column">';
+                    echo '<div>';
                     echo '<h5 class="fw-bolder">' . $row['nom'] . '</h5>';
                     echo '<p class="text-muted">' . $row['categorie'] . '</p>';
                     echo '<p>' . $row['description'] . '</p>';
                     echo '<h5>' . $row['prix'] . ' €</h5>';
-                    echo '<div class="vente-type">' . getTypeDeVente($row['type_de_vente']) . '</div>';
+                    echo '</div>';
+                    echo '<div class="bottom-aligned w-100">';
+                    echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
                     echo getActionButton($row['type_de_vente'], $row['id']);
                     echo '</div>';
                     echo '</div>';
@@ -143,7 +157,6 @@ function getActionButton($type, $id) {
         </div>
     </div>
 </div>
-
 
 </body>
 </html>
