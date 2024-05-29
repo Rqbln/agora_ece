@@ -1,5 +1,7 @@
 <?php
-
+include 'includes/db.php';
+include 'includes/header.php';
+include 'includes/navbar.php';
 include 'includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
