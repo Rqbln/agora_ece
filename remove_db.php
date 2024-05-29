@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "txrtxe";
+$password = "admin";
 $dbname = "agora_ece";
 
 // Créer une connexion
@@ -36,5 +36,13 @@ if ($conn->error) {
     echo "Toutes les données ont été supprimées avec succès.";
 }
 
+// Fermer la connexion
 $conn->close();
+
+// Démarrer la session et la détruire
+session_start();
+session_unset();
+session_destroy();
+
+echo "Toutes les sessions ont été déconnectées avec succès.";
 ?>

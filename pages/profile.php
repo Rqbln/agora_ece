@@ -65,6 +65,7 @@ $result_purchases = $conn->query($sql_purchases);
                 <div class="card-body">
                     <h5 class="card-title">Nom: <?php echo htmlspecialchars($row['nom']); ?></h5>
                     <p class="card-text">Email: <?php echo htmlspecialchars($row['email']); ?></p>
+                    <p class="card-text">Rôle: <?php echo htmlspecialchars($row['role']); ?></p> <!-- Affichage du rôle -->
                     <a href="update_profile.php" class="btn btn-primary">Mettre à jour les infos</a>
                 </div>
             </div>
