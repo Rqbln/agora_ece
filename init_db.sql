@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS produits (
                                         categorie ENUM('Meubles et objets d’art', 'Accessoire VIP', 'Matériels scolaires') NOT NULL,
                                         type_de_vente ENUM('vente_immediate', 'vente_negociation', 'vente_meilleure_offre') NOT NULL,
                                         vendu BOOLEAN DEFAULT FALSE,
+                                        acheteur_email VARCHAR(255),
                                         vendeur_id INT,
                                         FOREIGN KEY (vendeur_id) REFERENCES utilisateurs(id)
 );
@@ -159,4 +160,4 @@ WHERE email = 'vendeur1@example.com';
 
 -- Insertion d'une carte de crédit fictive
 INSERT INTO cartes_credit (numero_carte, date_expiration, cvv)
-SELECT '1234567812345678', '2025-15-31', '123'
+VALUES ('1234567812345678', '2025-12-31', '123');

@@ -24,7 +24,13 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 } else {
     echo "<div class='alert alert-danger' role='alert'>Utilisateur non trouvé.</div>";
+    exit();
 }
+
+// Fetch immediate purchases
+$sql_purchases = "SELECT * FROM produits WHERE acheteur_email = '" . $conn->real_escape_string($row['email']) . "' AND type_de_vente = 'vente_immediate'";
+$result_purchases = $conn->query($sql_purchases);
+
 ?>
 
 <!DOCTYPE html>
@@ -34,6 +40,20 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+    </style>
 </head>
 <body>
 <div class="wrapper">
@@ -51,6 +71,23 @@ if ($result->num_rows > 0) {
             <form action="/agora_ece/logout.php" method="post" class="mt-3">
                 <button type="submit" class="btn btn-danger">Déconnexion</button>
             </form>
+            <h2 class="mt-5">Achats Immédiats</h2>
+            <?php if ($result_purchases->num_rows > 0): ?>
+                <?php while($purchase = $result_purchases->fetch_assoc()): ?>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo htmlspecialchars($purchase['nom']); ?></h5>
+                            <p class="card-text"><?php echo htmlspecialchars($purchase['description']); ?></p>
+                            <p class="card-text"><strong>Prix: </strong><?php echo htmlspecialchars($purchase['prix']); ?> €</p>
+                            <div class="alert alert-success" role="alert">
+                                Paiement réussi
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>Aucun achat immédiat trouvé.</p>
+            <?php endif; ?>
         </div>
     </div>
     <?php include '../includes/footer.php'; ?>
