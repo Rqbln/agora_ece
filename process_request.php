@@ -1,12 +1,13 @@
 <?php
-include 'includes/db.php';
+include 'includes/db.php';  // Ajustez le chemin si nécessaire
 session_start();
 
 if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
 }
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'administrateur') {
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'administrateur') {
+    $_SESSION['error_message'] = "Vous n'avez pas les autorisations nécessaires.";
     header("Location: /agora_ece/pages/seller_space.php");
     exit();
 }
@@ -18,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['request_id']) && isset
     $sql = "SELECT * FROM demandes_vendeur WHERE id='$request_id'";
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
+    if ($result && $result->num_rows > 0) {
         $request = $result->fetch_assoc();
         $user_id = $request['utilisateur_id'];
 
@@ -39,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['request_id']) && isset
             }
         }
     } else {
-        $_SESSION['error_message'] = "Demande non trouvée.";
+        $_SESSION['error_message'] = "Demande non trouvée ou erreur de requête : " . $conn->error;
     }
     header("Location: /agora_ece/pages/seller_space.php");
     exit();

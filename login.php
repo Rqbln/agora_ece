@@ -30,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($mot_de_passe, $row['mot_de_passe'])) {
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['user_nom'] = $row['nom'];
+            $_SESSION['user_role'] = $row['role']; // Stocker le rôle de l'utilisateur dans la session
             header("Location: pages/profile.php");
             exit();
         } else {

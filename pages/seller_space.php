@@ -40,15 +40,16 @@ if (isset($_SESSION['error_message'])) {
 }
 
 if ($user['role'] == 'acheteur') {
+    // Vérifiez si l'utilisateur a déjà fait une demande
+    $sql_check_request = "SELECT * FROM demandes_vendeur WHERE utilisateur_id='$user_id'";
+    $result_check_request = $conn->query($sql_check_request);
+    $has_pending_request = $result_check_request->num_rows > 0;
+
     // Demande pour devenir vendeur
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['demande_vendeur'])) {
-        $sql_check_request = "SELECT * FROM demandes_vendeur WHERE utilisateur_id='$user_id'";
-        $result_check_request = $conn->query($sql_check_request);
-
-        if ($result_check_request->num_rows == 0) {
+        if (!$has_pending_request) {
             $sql_request = "INSERT INTO demandes_vendeur (utilisateur_id, statut) VALUES ('$user_id', 'en_attente')";
             if ($conn->query($sql_request) === TRUE) {
-                $_SESSION['message'] = "Votre demande pour devenir vendeur a été envoyée.";
             } else {
                 $_SESSION['error_message'] = "Erreur lors de l'envoi de la demande : " . $conn->error;
             }
@@ -99,11 +100,23 @@ if ($user['role'] == 'acheteur') {
         <div class="container mt-5">
             <h1 class="mb-4">Espace Vendeur</h1>
 
+            <?php if (isset($_SESSION['message'])): ?>
+                <div class="alert alert-success"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></div>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger"><?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?></div>
+            <?php endif; ?>
+
             <?php if ($user['role'] == 'acheteur'): ?>
-                <form method="post" action="seller_space.php">
-                    <input type="hidden" name="demande_vendeur" value="1">
-                    <button type="submit" class="btn btn-primary">Demander à devenir vendeur</button>
-                </form>
+                <?php if ($has_pending_request): ?>
+                    <div class="alert alert-info">Votre demande pour devenir vendeur est en attente.</div>
+                <?php else: ?>
+                    <form method="post" action="seller_space.php">
+                        <input type="hidden" name="demande_vendeur" value="1">
+                        <button type="submit" class="btn btn-primary">Demander à devenir vendeur</button>
+                    </form>
+                <?php endif; ?>
             <?php elseif ($user['role'] == 'vendeur'): ?>
                 <a href="../create_listing.php" class="btn btn-primary">Créer une annonce</a>
             <?php elseif ($user['role'] == 'administrateur'): ?>
