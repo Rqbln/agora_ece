@@ -50,6 +50,7 @@ if ($user['role'] == 'acheteur') {
         if (!$has_pending_request) {
             $sql_request = "INSERT INTO demandes_vendeur (utilisateur_id, statut) VALUES ('$user_id', 'en_attente')";
             if ($conn->query($sql_request) === TRUE) {
+                $_SESSION['message'] = "Votre demande pour devenir vendeur a été envoyée.";
             } else {
                 $_SESSION['error_message'] = "Erreur lors de l'envoi de la demande : " . $conn->error;
             }
@@ -59,8 +60,8 @@ if ($user['role'] == 'acheteur') {
         header("Location: seller_space.php");
         exit();
     }
-} elseif ($user['role'] == 'administrateur') {
-    // Code pour les administrateurs (afficher les demandes de vendeur)
+} elseif ($user['role'] == 'administrateur' || $user['role'] == 'vendeur') {
+    // Code pour les administrateurs et les vendeurs
     $sql_requests = "SELECT demandes_vendeur.*, utilisateurs.nom, utilisateurs.email FROM demandes_vendeur JOIN utilisateurs ON demandes_vendeur.utilisateur_id = utilisateurs.id WHERE demandes_vendeur.statut = 'en_attente'";
     $result_requests = $conn->query($sql_requests);
 }
@@ -117,37 +118,38 @@ if ($user['role'] == 'acheteur') {
                         <button type="submit" class="btn btn-primary">Demander à devenir vendeur</button>
                     </form>
                 <?php endif; ?>
-            <?php elseif ($user['role'] == 'vendeur'): ?>
-                <a href="../create_listing.php" class="btn btn-primary">Créer une annonce</a>
-            <?php elseif ($user['role'] == 'administrateur'): ?>
-                <h2>Demandes pour devenir vendeur</h2>
-                <?php if ($result_requests->num_rows > 0): ?>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Email</th>
-                            <th>Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php while($request = $result_requests->fetch_assoc()): ?>
+            <?php elseif ($user['role'] == 'vendeur' || $user['role'] == 'administrateur'): ?>
+                <a href="../sale.php" class="btn btn-primary">Créer une annonce</a>
+                <?php if ($user['role'] == 'administrateur'): ?>
+                    <h2>Demandes pour devenir vendeur</h2>
+                    <?php if ($result_requests->num_rows > 0): ?>
+                        <table class="table">
+                            <thead>
                             <tr>
-                                <td><?php echo htmlspecialchars($request['nom']); ?></td>
-                                <td><?php echo htmlspecialchars($request['email']); ?></td>
-                                <td>
-                                    <form method="post" action="../process_request.php">
-                                        <input type="hidden" name="request_id" value="<?php echo $request['id']; ?>">
-                                        <button type="submit" name="action" value="accept" class="btn btn-success">Accepter</button>
-                                        <button type="submit" name="action" value="deny" class="btn btn-danger">Refuser</button>
-                                    </form>
-                                </td>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Action</th>
                             </tr>
-                        <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>Aucune demande en attente.</p>
+                            </thead>
+                            <tbody>
+                            <?php while($request = $result_requests->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($request['nom']); ?></td>
+                                    <td><?php echo htmlspecialchars($request['email']); ?></td>
+                                    <td>
+                                        <form method="post" action="../process_request.php">
+                                            <input type="hidden" name="request_id" value="<?php echo $request['id']; ?>">
+                                            <button type="submit" name="action" value="accept" class="btn btn-success">Accepter</button>
+                                            <button type="submit" name="action" value="deny" class="btn btn-danger">Refuser</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>Aucune demande en attente.</p>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
         </div>

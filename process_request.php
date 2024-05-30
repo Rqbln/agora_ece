@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['request_id']) && isset
         $user_id = $request['utilisateur_id'];
 
         if ($action == 'accept') {
-            $sql_update_user = "UPDATE utilisateurs SET role='vendeur' WHERE id='$user_id'";
+            $sql_update_user = "UPDATE utilisateurs SET role='vendeur' WHERE id='$user_id' AND role != 'administrateur'";
             $sql_update_request = "UPDATE demandes_vendeur SET statut='accepté' WHERE id='$request_id'";
             if ($conn->query($sql_update_user) === TRUE && $conn->query($sql_update_request) === TRUE) {
                 $_SESSION['message'] = "La demande a été acceptée avec succès.";
