@@ -75,7 +75,7 @@ include 'includes/navbar.php';
                 var reader = new FileReader();
                 reader.onload = (function(f) {
                     return function(e) {
-                        var img = document.createElement('img_url');
+                        var img = document.createElement('img');
                         img.src = e.target.result;
                         img.style.maxWidth = '100%';
                         img.style.height = 'auto';
