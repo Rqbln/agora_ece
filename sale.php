@@ -15,11 +15,11 @@ include 'includes/navbar.php';
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-4">
-            <h4>Importer des images</h4>
+            <h4>Importer une image</h4>
             <form id="imageForm" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="imageInput" class="btn btn-primary">Importer des images</label>
-                    <input type="file" class="form-control-file d-none" id="imageInput" name="images[]" accept="image/*" multiple>
+                    <label for="imageInput" class="btn btn-primary">Importer une image</label>
+                    <input type="file" class="form-control-file d-none" id="imageInput" name="image" accept="image/*">
                 </div>
                 <div id="preview" class="mb-3"></div>
             </form>
