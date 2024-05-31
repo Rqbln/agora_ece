@@ -30,6 +30,27 @@ if ($result->num_rows > 0) {
 $sql_purchases = "SELECT * FROM produits WHERE acheteur_email = '" . $conn->real_escape_string($row['email']) . "' AND type_de_vente = 'vente_immediate'";
 $result_purchases = $conn->query($sql_purchases);
 
+$message = '';
+
+// Handle credit card submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
+    $numero_carte = $_POST['numero_carte'];
+    $date_expiration = $_POST['date_expiration'];
+    $cvv = $_POST['cvv'];
+
+    $sql_insert_card = "INSERT INTO cartes_credit (numero_carte, date_expiration, cvv) VALUES ('$numero_carte', '$date_expiration', '$cvv')";
+    if ($conn->query($sql_insert_card) === TRUE) {
+        $carte_id = $conn->insert_id;
+        $sql_update_user = "UPDATE utilisateurs SET carte_id = '$carte_id' WHERE id = '$user_id'";
+        if ($conn->query($sql_update_user) === TRUE) {
+            $message = "<div class='alert alert-success' role='alert'>Carte de crédit enregistrée avec succès.</div>";
+        } else {
+            $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la mise à jour de l'utilisateur : " . $conn->error . "</div>";
+        }
+    } else {
+        $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement de la carte de crédit : " . $conn->error . "</div>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -40,6 +61,14 @@ $result_purchases = $conn->query($sql_purchases);
     <title>Profil</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content {
+            flex: 1;
+        }
         .container {
             max-width: 800px;
             margin-top: 50px;
@@ -51,6 +80,14 @@ $result_purchases = $conn->query($sql_purchases);
             background-color: #d4edda;
             border-color: #c3e6cb;
             color: #155724;
+        }
+        .navbar {
+            margin-bottom: 20px;
+        }
+        .footer {
+            margin-top: auto;
+            background-color: #f8f9fa;
+            padding: 20px 0;
         }
     </style>
 </head>
@@ -68,10 +105,11 @@ $result_purchases = $conn->query($sql_purchases);
                     <a href="update_profile.php" class="btn btn-primary">Mettre à jour les infos</a>
                 </div>
             </div>
+            <?php if (!empty($message)) echo $message; ?>
             <form action="/agora_ece/logout.php" method="post" class="mt-3">
                 <button type="submit" class="btn btn-danger">Déconnexion</button>
             </form>
-            <h2 class="mt-5">Achats Immédiats</h2>
+            <h2 class="mt-5">Achats</h2>
             <?php if ($result_purchases->num_rows > 0): ?>
                 <?php while($purchase = $result_purchases->fetch_assoc()): ?>
                     <div class="card">
@@ -88,9 +126,27 @@ $result_purchases = $conn->query($sql_purchases);
             <?php else: ?>
                 <p>Aucun achat immédiat trouvé.</p>
             <?php endif; ?>
+            <h2 class="mt-5">Enregistrer une carte de crédit</h2>
+            <form method="post" action="">
+                <div class="form-group">
+                    <label for="numero_carte">Numéro de carte:</label>
+                    <input type="text" class="form-control" id="numero_carte" name="numero_carte" required>
+                </div>
+                <div class="form-group">
+                    <label for="date_expiration">Date d'expiration:</label>
+                    <input type="date" class="form-control" id="date_expiration" name="date_expiration" required>
+                </div>
+                <div class="form-group">
+                    <label for="cvv">CVC:</label>
+                    <input type="text" class="form-control" id="cvv" name="cvv" required>
+                </div>
+                <button type="submit" name="add_card" class="btn btn-primary mt-3">Enregistrer la carte</button>
+            </form>
         </div>
     </div>
-    <?php include '../includes/footer.php'; ?>
+    <div class="footer">
+        <?php include '../includes/footer.php'; ?>
+    </div>
 </div>
 </body>
 </html>

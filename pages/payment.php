@@ -31,16 +31,21 @@ if ($result->num_rows > 0) {
     die("Produit non trouvé. ID: " . $produit_id);
 }
 
-$prix_total_ht = $produit['prix'];
-$taxe = $prix_total_ht * 0.20; // Calcul de la TVA à 20%
-$prix_total_ttc = $prix_total_ht + $taxe;
+$prix_total_ttc = $produit['prix'];
+$taxe = $prix_total_ttc * 0.20 / 1.20; // Calcul de la TVA à 20% incluse dans le prix
+$prix_total_ht = $prix_total_ttc - $taxe;
 
 $message = '';
 
+// Check if the user has a linked card
+$sql_card_check = "SELECT * FROM cartes_credit WHERE id = (SELECT carte_id FROM utilisateurs WHERE id='$user_id')";
+$result_card_check = $conn->query($sql_card_check);
+$card_info = $result_card_check->fetch_assoc();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $card_number = $_POST['card_number'];
-    $card_expiry = $_POST['card_expiry'];
-    $card_cvc = $_POST['card_cvc'];
+    $card_number = $_POST['card_number'] ?? $card_info['numero_carte'];
+    $card_expiry = $_POST['card_expiry'] ?? $card_info['date_expiration'];
+    $card_cvc = $_POST['card_cvc'] ?? $card_info['cvv'];
 
     // Vérifier les informations de la carte de crédit
     $sql = "SELECT * FROM cartes_credit WHERE numero_carte='$card_number' AND date_expiration='$card_expiry' AND cvv='$card_cvc'";
@@ -122,13 +127,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: black;
             color: white;
         }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: black;
+            color: white;
+        }
         .alert {
             margin-top: 20px;
         }
         .form-group label {
             text-decoration: underline;
         }
-        .card-title, .card-text, .btn, h1, label {
+        .card-title, .card-text, h5, h1 {
             text-decoration: underline;
         }
         .recap {
@@ -137,6 +151,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 5px;
             background-color: #f8f9fa;
             margin-bottom: 20px;
+        }
+        .or-separator {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .button-container {
+            text-align: center;
         }
     </style>
 </head>
@@ -156,30 +178,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="card-body">
                     <h5 class="card-title"><?php echo htmlspecialchars($produit['nom']); ?></h5>
                     <p class="card-text"><?php echo htmlspecialchars($produit['description']); ?></p>
-                    <p class="card-text"><strong>Prix HT: </strong><?php echo htmlspecialchars($prix_total_ht); ?> €</p>
-                    <p class="card-text"><strong>Taxes (20%): </strong><?php echo htmlspecialchars($taxe); ?> €</p>
                     <p class="card-text"><strong>Prix TTC: </strong><?php echo htmlspecialchars($prix_total_ttc); ?> €</p>
                 </div>
             </div>
-            <form method="post" action="">
-                <div class="form-group">
-                    <label for="card_number">Numéro de carte:</label>
-                    <input type="text" class="form-control" id="card_number" name="card_number" required>
-                </div>
-                <div class="form-group">
-                    <label for="card_expiry">Date d'expiration:</label>
-                    <input type="date" class="form-control" id="card_expiry" name="card_expiry" required>
-                </div>
-                <div class="form-group">
-                    <label for="card_cvc">CVC:</label>
-                    <input type="text" class="form-control" id="card_cvc" name="card_cvc" required>
-                </div>
-                <input type="hidden" name="produit_id" value="<?php echo htmlspecialchars($produit['id']); ?>">
-                <input type="hidden" name="prix_total_ht" value="<?php echo htmlspecialchars($prix_total_ht); ?>">
-                <input type="hidden" name="taxe" value="<?php echo htmlspecialchars($taxe); ?>">
-                <input type="hidden" name="prix_total_ttc" value="<?php echo htmlspecialchars($prix_total_ttc); ?>">
-                <button type="submit" class="btn btn-primary mt-3">Payer</button>
-            </form>
+            <div class="button-container">
+                <?php if ($result_card_check->num_rows > 0): ?>
+                    <form method="post" action="">
+                        <input type="hidden" name="card_number" value="<?php echo htmlspecialchars($card_info['numero_carte']); ?>">
+                        <input type="hidden" name="card_expiry" value="<?php echo htmlspecialchars($card_info['date_expiration']); ?>">
+                        <input type="hidden" name="card_cvc" value="<?php echo htmlspecialchars($card_info['cvv']); ?>">
+                        <button type="submit" class="btn btn-primary mt-3">Payer avec la carte enregistrée</button>
+                    </form>
+                    <div class="or-separator">ou</div>
+                <?php endif; ?>
+                <form method="post" action="">
+                    <div class="form-group">
+                        <label for="card_number">Numéro de carte:</label>
+                        <input type="text" class="form-control" id="card_number" name="card_number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="card_expiry">Date d'expiration:</label>
+                        <input type="date" class="form-control" id="card_expiry" name="card_expiry" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="card_cvc">CVC:</label>
+                        <input type="text" class="form-control" id="card_cvc" name="card_cvc" required>
+                    </div>
+                    <input type="hidden" name="produit_id" value="<?php echo htmlspecialchars($produit['id']); ?>">
+                    <input type="hidden" name="prix_total_ht" value="<?php echo htmlspecialchars($prix_total_ht); ?>">
+                    <input type="hidden" name="taxe" value="<?php echo htmlspecialchars($taxe); ?>">
+                    <input type="hidden" name="prix_total_ttc" value="<?php echo htmlspecialchars($prix_total_ttc); ?>">
+                    <button type="submit" class="btn btn-primary mt-3">Payer</button>
+                </form>
+                <a href="home.php" class="btn btn-secondary mt-3">Annuler</a>
+            </div>
         </div>
     </div>
     <?php include '../includes/footer.php'; ?>
