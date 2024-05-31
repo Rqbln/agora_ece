@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
                                             carte_id INT,
                                             nb_objet_panier INT DEFAULT 0,
                                             adresse TEXT,
+                                            nombre_article INT DEFAULT 0,
                                             FOREIGN KEY (carte_id) REFERENCES cartes_credit(id)
 );
 

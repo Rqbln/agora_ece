@@ -30,6 +30,10 @@ if ($result->num_rows > 0) {
 $sql_purchases = "SELECT * FROM produits WHERE acheteur_email = '" . $conn->real_escape_string($row['email']) . "' AND type_de_vente = 'vente_immediate'";
 $result_purchases = $conn->query($sql_purchases);
 
+// Fetch user credit cards
+$sql_cards = "SELECT * FROM cartes_credit WHERE id IN (SELECT carte_id FROM utilisateurs WHERE id='$user_id' AND carte_id IS NOT NULL)";
+$result_cards = $conn->query($sql_cards);
+
 $message = '';
 
 // Handle credit card submission
@@ -50,6 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
     } else {
         $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement de la carte de crédit : " . $conn->error . "</div>";
     }
+    // Refresh card list
+    $sql_cards = "SELECT * FROM cartes_credit WHERE id IN (SELECT carte_id FROM utilisateurs WHERE id='$user_id' AND carte_id IS NOT NULL)";
+    $result_cards = $conn->query($sql_cards);
 }
 ?>
 
@@ -81,6 +88,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
             border-color: #c3e6cb;
             color: #155724;
         }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
         .navbar {
             margin-bottom: 20px;
         }
@@ -88,6 +100,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
             margin-top: auto;
             background-color: #f8f9fa;
             padding: 20px 0;
+        }
+        .credit-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
         }
     </style>
 </head>
@@ -101,7 +120,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
                 <div class="card-body">
                     <h5 class="card-title">Nom: <?php echo htmlspecialchars($row['nom']); ?></h5>
                     <p class="card-text">Email: <?php echo htmlspecialchars($row['email']); ?></p>
-                    <p class="card-text">Rôle: <?php echo htmlspecialchars($row['role']); ?></p> <!-- Affichage du rôle -->
+                    <p class="card-text">Rôle: <?php echo htmlspecialchars($row['role']); ?></p>
+                    <p class="card-text">Adresse: <?php echo htmlspecialchars(!empty($row['adresse']) ? $row['adresse'] : '- Adresse non renseignée -'); ?></p>
                     <a href="update_profile.php" class="btn btn-primary">Mettre à jour les infos</a>
                 </div>
             </div>
@@ -142,6 +162,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
                 </div>
                 <button type="submit" name="add_card" class="btn btn-primary mt-3">Enregistrer la carte</button>
             </form>
+            <h2 class="mt-5">Carte de crédit enregistrée</h2>
+            <?php if ($result_cards->num_rows > 0): ?>
+                <?php $card_number = 1; ?>
+                <?php while($card = $result_cards->fetch_assoc()): ?>
+                    <div class="credit-card">
+                        <h5 class="card-title">Carte <?php echo $card_number++; ?></h5>
+                        <p class="card-text">
+                            Numéro de carte:
+                            <?php
+                            echo substr($card['numero_carte'], 0, 4) . str_repeat('*', 12);
+                            ?>
+                        </p>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>Aucune carte de crédit enregistrée.</p>
+            <?php endif; ?>
         </div>
     </div>
     <div class="footer">
