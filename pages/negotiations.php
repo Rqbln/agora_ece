@@ -36,12 +36,15 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Négociations</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content {
+            flex: 1;
         }
         h1 {
             text-align: center;
@@ -70,34 +73,44 @@ if (!$result) {
         tr:hover {
             background-color: #ddd;
         }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-<h1>Mes Négociations</h1>
+<?php include '../includes/navbar.php'; ?>
+<div class="content">
+    <h1>Mes Négociations</h1>
 
-<table>
-    <thead>
-    <tr>
-        <th>Produit</th>
-        <th>Offre (€)</th>
-        <th>Date</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php
-    if ($result->num_rows === 0) {
-        echo "<tr><td colspan='3'>Aucune négociation trouvée.</td></tr>";
-    } else {
-        while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($row['nom']); ?></td>
-                <td><?php echo htmlspecialchars($row['montant']); ?></td>
-                <td><?php echo htmlspecialchars($row['date_enchere']); ?></td>
-            </tr>
-        <?php endwhile;
-    } ?>
-    </tbody>
-</table>
-
+    <table>
+        <thead>
+        <tr>
+            <th>Produit</th>
+            <th>Offre (€)</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        if ($result->num_rows === 0) {
+            echo "<tr><td colspan='3'>Aucune négociation trouvée.</td></tr>";
+        } else {
+            while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($row['nom']); ?></td>
+                    <td><?php echo htmlspecialchars($row['montant']); ?></td>
+                    <td><?php echo htmlspecialchars($row['date_enchere']); ?></td>
+                </tr>
+            <?php endwhile;
+        } ?>
+        </tbody>
+    </table>
+</div>
+<div class="footer">
+    <?php include '../includes/footer.php'; ?>
+</div>
 </body>
 </html>

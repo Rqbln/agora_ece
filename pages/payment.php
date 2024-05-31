@@ -16,23 +16,48 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-if (!isset($_GET['id'])) {
-    die("Produit non trouvé. ID manquant.");
-}
-
-$produit_id = $_GET['id'];
-
-$sql = "SELECT * FROM produits WHERE id='$produit_id'";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    $produit = $result->fetch_assoc();
+$sql_user = "SELECT * FROM utilisateurs WHERE id='$user_id'";
+$result_user = $conn->query($sql_user);
+if ($result_user->num_rows > 0) {
+    $user = $result_user->fetch_assoc();
 } else {
-    die("Produit non trouvé. ID: " . $produit_id);
+    die("Utilisateur non trouvé. ID: " . $user_id);
 }
 
-$prix_total_ttc = $produit['prix'];
-$taxe = $prix_total_ttc * 0.20 / 1.20; // Calcul de la TVA à 20% incluse dans le prix
+$produit_id = isset($_GET['id']) ? $_GET['id'] : null;
+
+if ($produit_id) {
+    $sql_produit = "SELECT * FROM produits WHERE id='$produit_id' AND vendu=0";
+    $result_produit = $conn->query($sql_produit);
+
+    if ($result_produit->num_rows > 0) {
+        $produit = $result_produit->fetch_assoc();
+        $produits[] = $produit;
+        $prix_total_ttc = $produit['prix'];
+    } else {
+        die("Produit non trouvé ou déjà vendu.");
+    }
+} else {
+    $sql_cart = "
+        SELECT p.*, cp.quantite 
+        FROM panier_produits cp 
+        JOIN produits p ON cp.produit_id = p.id 
+        WHERE cp.panier_id = (SELECT id FROM paniers WHERE utilisateur_id = '$user_id')
+    ";
+    $result_cart = $conn->query($sql_cart);
+
+    if ($result_cart->num_rows == 0) {
+        die("Aucun produit dans le panier.");
+    }
+
+    $prix_total_ttc = 0;
+    while ($produit = $result_cart->fetch_assoc()) {
+        $produits[] = $produit;
+        $prix_total_ttc += $produit['prix'] * $produit['quantite'];
+    }
+}
+
+$taxe = $prix_total_ttc * 0.20 / 1.20;
 $prix_total_ht = $prix_total_ttc - $taxe;
 
 $message = '';
@@ -46,6 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $card_number = $_POST['card_number'] ?? $card_info['numero_carte'];
     $card_expiry = $_POST['card_expiry'] ?? $card_info['date_expiration'];
     $card_cvc = $_POST['card_cvc'] ?? $card_info['cvv'];
+    $new_address = $_POST['new_address'] ?? $user['adresse'];
 
     // Vérifier les informations de la carte de crédit
     $sql = "SELECT * FROM cartes_credit WHERE numero_carte='$card_number' AND date_expiration='$card_expiry' AND cvv='$card_cvc'";
@@ -54,50 +80,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         // Carte de crédit valide
 
-        // Vérifier si l'utilisateur existe
-        $sql_user_check = "SELECT * FROM utilisateurs WHERE id='$user_id'";
-        $result_user_check = $conn->query($sql_user_check);
+        // Créer une commande
+        $sql_commande = "INSERT INTO commandes (utilisateur_id, status) VALUES ('$user_id', 'en_attente')";
+        if ($conn->query($sql_commande) === TRUE) {
+            $commande_id = $conn->insert_id;
 
-        if ($result_user_check->num_rows > 0) {
-            // Créer une commande
-            $sql_commande = "INSERT INTO commandes (utilisateur_id, status) VALUES ('$user_id', 'en_attente')";
-            if ($conn->query($sql_commande) === TRUE) {
-                $commande_id = $conn->insert_id;
-
-                // Ajouter le produit à la commande
-                $sql_commande_produit = "INSERT INTO commande_produits (commande_id, produit_id, quantite) VALUES ('$commande_id', '$produit_id', 1)";
-                if ($conn->query($sql_commande_produit) === TRUE) {
-
-                    // Enregistrer le paiement
-                    $sql_paiement = "INSERT INTO paiements (commande_id, montant, type, statut) VALUES ('$commande_id', '$prix_total_ttc', 'carte', 'complet')";
-                    if ($conn->query($sql_paiement) === TRUE) {
-
-                        // Obtenir l'email de l'utilisateur
-                        $sql_email = "SELECT email FROM utilisateurs WHERE id='$user_id'";
-                        $result_email = $conn->query($sql_email);
-                        $email = '';
-                        if ($result_email->num_rows > 0) {
-                            $email = $result_email->fetch_assoc()['email'];
-                        }
-
-                        // Mettre à jour le produit comme vendu et attribuer l'email de l'acheteur
-                        $sql_update_produit = "UPDATE produits SET vendu=1, acheteur_email='$email' WHERE id='$produit_id'";
-                        if ($conn->query($sql_update_produit) === TRUE) {
-                            $message = "<div class='alert alert-success' role='alert'>Paiement réussi. Votre commande a été passée.</div>";
-                        } else {
-                            $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la mise à jour du produit : " . $conn->error . "</div>";
-                        }
-                    } else {
-                        $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement du paiement : " . $conn->error . "</div>";
-                    }
-                } else {
+            // Ajouter les produits à la commande
+            foreach ($produits as $produit) {
+                $sql_commande_produit = "INSERT INTO commande_produits (commande_id, produit_id, quantite) VALUES ('$commande_id', '{$produit['id']}', 1)";
+                if ($conn->query($sql_commande_produit) !== TRUE) {
                     $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'ajout du produit à la commande : " . $conn->error . "</div>";
+                    break;
                 }
+            }
+
+            // Enregistrer le paiement
+            $sql_paiement = "INSERT INTO paiements (commande_id, montant, type, statut) VALUES ('$commande_id', '$prix_total_ttc', 'carte', 'complet')";
+            if ($conn->query($sql_paiement) === TRUE) {
+
+                // Mettre à jour les produits comme vendus et attribuer l'email de l'acheteur
+                foreach ($produits as $produit) {
+                    $sql_update_produit = "UPDATE produits SET vendu=1, acheteur_email='{$user['email']}' WHERE id='{$produit['id']}'";
+                    if ($conn->query($sql_update_produit) !== TRUE) {
+                        $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la mise à jour du produit : " . $conn->error . "</div>";
+                        break;
+                    }
+                }
+
+                // Mettre à jour l'adresse de livraison si différente
+                if ($new_address != $user['adresse']) {
+                    $sql_update_address = "UPDATE utilisateurs SET adresse='$new_address' WHERE id='$user_id'";
+                    $conn->query($sql_update_address);
+                }
+
+                // Vider le panier si la commande provient du panier
+                if (!$produit_id) {
+                    $sql_vider_panier = "DELETE FROM panier_produits WHERE panier_id = (SELECT id FROM paniers WHERE utilisateur_id = '$user_id')";
+                    $conn->query($sql_vider_panier);
+                }
+
+                $message = "<div class='alert alert-success' role='alert'>Paiement réussi. Votre commande a été passée.</div>";
             } else {
-                $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la création de la commande : " . $conn->error . "</div>";
+                $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement du paiement : " . $conn->error . "</div>";
             }
         } else {
-            $message = "<div class='alert alert-danger' role='alert'>Utilisateur non trouvé. ID: " . $user_id . "</div>";
+            $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la création de la commande : " . $conn->error . "</div>";
         }
     } else {
         // Carte de crédit non valide
@@ -107,15 +134,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment</title>
+    <title>Paiement</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin-top: 50px;
         }
         .btn-primary {
@@ -160,6 +187,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .button-container {
             text-align: center;
         }
+        .credit-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+        }
     </style>
 </head>
 <body>
@@ -174,15 +211,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo $message;
             }
             ?>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><?php echo htmlspecialchars($produit['nom']); ?></h5>
-                    <p class="card-text"><?php echo htmlspecialchars($produit['description']); ?></p>
-                    <p class="card-text"><strong>Prix TTC: </strong><?php echo htmlspecialchars($prix_total_ttc); ?> €</p>
-                </div>
+            <div class="recap mb-4">
+                <h5>Récapitulatif de la commande</h5>
+                <?php foreach ($produits as $produit): ?>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo htmlspecialchars($produit['nom']); ?></h5>
+                            <p class="card-text"><?php echo htmlspecialchars($produit['description']); ?></p>
+                            <p class="card-text"><strong>Prix TTC: </strong><?php echo htmlspecialchars($produit['prix']); ?> €</p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+                <p><strong>Prix total HT: </strong><?php echo htmlspecialchars(number_format($prix_total_ht, 2)); ?> €</p>
+                <p><strong>Taxe: </strong><?php echo htmlspecialchars(number_format($taxe, 2)); ?> €</p>
+                <p><strong>Prix total TTC: </strong><?php echo htmlspecialchars(number_format($prix_total_ttc, 2)); ?> €</p>
             </div>
-            <div class="button-container">
-                <?php if ($result_card_check->num_rows > 0): ?>
+            <div class="recap mb-4">
+                <h5>Informations de livraison</h5>
+                <p><strong>Nom: </strong><?php echo htmlspecialchars($user['nom']); ?></p>
+                <p><strong>Adresse: </strong><?php echo htmlspecialchars($user['adresse'] ?? '- Adresse non renseignée -'); ?></p>
+            </div>
+            <?php if ($result_card_check->num_rows > 0): ?>
+                <div class="credit-card">
+                    <h5 class="card-title">Carte 1</h5>
+                    <p class="card-text">
+                        Numéro de carte:
+                        <?php
+                        echo substr($card_info['numero_carte'], 0, 4) . str_repeat('*', 12);
+                        ?>
+                    </p>
+                </div>
+                <div class="button-container">
                     <form method="post" action="">
                         <input type="hidden" name="card_number" value="<?php echo htmlspecialchars($card_info['numero_carte']); ?>">
                         <input type="hidden" name="card_expiry" value="<?php echo htmlspecialchars($card_info['date_expiration']); ?>">
@@ -190,7 +249,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <button type="submit" class="btn btn-primary mt-3">Payer avec la carte enregistrée</button>
                     </form>
                     <div class="or-separator">ou</div>
-                <?php endif; ?>
+                </div>
+            <?php endif; ?>
+            <div class="button-container">
                 <form method="post" action="">
                     <div class="form-group">
                         <label for="card_number">Numéro de carte:</label>
@@ -204,10 +265,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label for="card_cvc">CVC:</label>
                         <input type="text" class="form-control" id="card_cvc" name="card_cvc" required>
                     </div>
-                    <input type="hidden" name="produit_id" value="<?php echo htmlspecialchars($produit['id']); ?>">
-                    <input type="hidden" name="prix_total_ht" value="<?php echo htmlspecialchars($prix_total_ht); ?>">
-                    <input type="hidden" name="taxe" value="<?php echo htmlspecialchars($taxe); ?>">
-                    <input type="hidden" name="prix_total_ttc" value="<?php echo htmlspecialchars($prix_total_ttc); ?>">
+                    <div class="form-group">
+                        <label for="new_address">Se faire livrer à une autre adresse:</label>
+                        <textarea class="form-control" id="new_address" name="new_address"><?php echo htmlspecialchars($user['adresse']); ?></textarea>
+                    </div>
                     <button type="submit" class="btn btn-primary mt-3">Payer</button>
                 </form>
                 <a href="home.php" class="btn btn-secondary mt-3">Annuler</a>
@@ -216,6 +277,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
     <?php include '../includes/footer.php'; ?>
 </div>
-
 </body>
 </html>
