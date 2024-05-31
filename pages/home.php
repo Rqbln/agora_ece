@@ -67,7 +67,7 @@ function getDescriptionForCategory($category) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accueil</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         .contact-info, .map-container {
             margin-top: 50px;
@@ -191,16 +191,18 @@ function getDescriptionForCategory($category) {
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                 <?php
                 if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
+                    while ($row = $result->fetch_assoc()) {
                         echo '<div class="col mb-5">';
                         echo '<div class="card h-100">';
-                        echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
+                        // Vérifie si l'URL de l'image commence déjà par "http" pour déterminer si c'est un lien externe
+                        $imagePath = (strpos($row['image_url'], 'http') === 0) ? $row['image_url'] : htmlspecialchars($row['image_url']);
+                        echo '<img class="card-img-top" src="' . $imagePath . '" alt="' . htmlspecialchars($row['nom']) . '">';
                         echo '<div class="card-body p-4 d-flex flex-column">';
                         echo '<div>';
-                        echo '<h5 class="fw-bolder">' . $row['nom'] . '</h5>';
-                        echo '<p class="text-muted">' . $row['categorie'] . '</p>';
-                        echo '<p>' . $row['description'] . '</p>';
-                        echo '<h5>' . $row['prix'] . ' €</h5>';
+                        echo '<h5 class="fw-bolder">' . htmlspecialchars($row['nom']) . '</h5>';
+                        echo '<p class="text-muted">' . htmlspecialchars($row['categorie']) . '</p>';
+                        echo '<p>' . htmlspecialchars($row['description']) . '</p>';
+                        echo '<h5>' . htmlspecialchars($row['prix']) . ' €</h5>';
                         echo '</div>';
                         echo '<div class="bottom-aligned w-100">';
                         echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
@@ -212,7 +214,10 @@ function getDescriptionForCategory($category) {
                         echo '</div>';
                         echo '</div>';
                     }
-                } else {
+                }
+
+
+                else {
                     echo "Aucun produit trouvé.";
                 }
                 ?>
