@@ -167,6 +167,26 @@ SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99
 FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
 
+INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
+SELECT 'Sac à main', 'Sac à main en cuir véritable de designer.', 999.99, 'https://m.media-amazon.com/images/I/71WkWDk-0LL._AC_UY300_.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', id
+FROM utilisateurs
+WHERE email = 'vendeur1@example.com';
+
+INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
+SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', 'Articles réguliers', 'vente_immediate', id
+FROM utilisateurs
+WHERE email = 'vendeur1@example.com';
+
+INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
+SELECT 'Sac à main', 'Sac à main en cuir véritable de designer.', 999.99, 'https://m.media-amazon.com/images/I/71WkWDk-0LL._AC_UY300_.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', id
+FROM utilisateurs
+WHERE email = 'vendeur1@example.com';
+
+INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
+SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', 'Articles réguliers', 'vente_immediate', id
+FROM utilisateurs
+WHERE email = 'vendeur1@example.com';
+
 -- Insertion d'une carte de crédit fictive
 INSERT INTO cartes_credit (numero_carte, date_expiration, cvv)
 VALUES ('1234567812345678', '2025-12-31', '123');
