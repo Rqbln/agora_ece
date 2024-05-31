@@ -1,7 +1,6 @@
 <?php
 include '../includes/db.php';
 
-
 session_start();
 
 if (!isset($conn)) {
@@ -19,9 +18,10 @@ $error_message = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nom = $_POST['nom'];
     $email = $_POST['email'];
+    $adresse = $_POST['adresse'];
     $mot_de_passe = $_POST['mot_de_passe'];
 
-    $sql = "UPDATE utilisateurs SET nom='$nom', email='$email' WHERE id='$user_id'";
+    $sql = "UPDATE utilisateurs SET nom='$nom', email='$email', adresse='$adresse' WHERE id='$user_id'";
 
     if (!empty($mot_de_passe)) {
         $mot_de_passe_hashed = password_hash($mot_de_passe, PASSWORD_DEFAULT);
@@ -96,6 +96,10 @@ if ($result->num_rows > 0) {
                     <div class="form-group">
                         <label for="email">Email:</label>
                         <input type="email" class="form-control" id="email" name="email" value="<?php echo $row['email']; ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adresse">Adresse:</label>
+                        <input type="text" class="form-control" id="adresse" name="adresse" value="<?php echo $row['adresse']; ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="mot_de_passe">Mot de passe (laisser vide pour ne pas changer):</label>

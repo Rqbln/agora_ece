@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
                                             mot_de_passe VARCHAR(255) NOT NULL,
                                             role ENUM('acheteur', 'vendeur', 'administrateur') NOT NULL,
                                             carte_id INT,
+                                            nb_objet_panier INT DEFAULT 0,
+                                            adresse TEXT,
                                             FOREIGN KEY (carte_id) REFERENCES cartes_credit(id)
 );
 
@@ -154,26 +156,6 @@ WHERE email = 'vendeur1@example.com';
 
 INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
 SELECT 'Table en verre', 'Table basse en verre trempé avec pieds en acier.', 199.99, 'https://www.concept-usine.com/cdn/shop/files/Table-basse-design-Nula-Concept-Usine_x300.png?v=1709905707', 'Articles rares', 'vente_negociation', id
-FROM utilisateurs
-WHERE email = 'vendeur1@example.com';
-
-INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
-SELECT 'Sac à main', 'Sac à main en cuir véritable de designer.', 999.99, 'https://m.media-amazon.com/images/I/71WkWDk-0LL._AC_UY300_.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', id
-FROM utilisateurs
-WHERE email = 'vendeur1@example.com';
-
-INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
-SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', 'Articles réguliers', 'vente_immediate', id
-FROM utilisateurs
-WHERE email = 'vendeur1@example.com';
-
-INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
-SELECT 'Sac à main', 'Sac à main en cuir véritable de designer.', 999.99, 'https://m.media-amazon.com/images/I/71WkWDk-0LL._AC_UY300_.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', id
-FROM utilisateurs
-WHERE email = 'vendeur1@example.com';
-
-INSERT INTO produits (nom, description, prix, image_url, categorie, type_de_vente, vendeur_id)
-SELECT 'Cahier de notes', 'Cahier de notes en papier recyclé, format A5.', 4.99, 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg', 'Articles réguliers', 'vente_immediate', id
 FROM utilisateurs
 WHERE email = 'vendeur1@example.com';
 
