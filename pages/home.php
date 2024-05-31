@@ -141,13 +141,13 @@ function getDescriptionForCategory($category) {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            background-color: #007bff;
+            background-color: #44977c;
             color: white;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.3s;
         }
         .filter-box button:hover {
-            background-color: #0056b3;
+            background-color: #2d6c59;
             transform: scale(1.1);
         }
         .filter-box button:focus {
