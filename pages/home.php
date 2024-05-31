@@ -9,7 +9,12 @@ if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
 }
 
-$sql = "SELECT * FROM produits WHERE vendu = 0"; // Modify the query to include vendu = 0
+$filter_category = isset($_GET['categorie']) ? $_GET['categorie'] : '';
+
+$sql = "SELECT * FROM produits WHERE vendu = 0";
+if ($filter_category) {
+    $sql .= " AND categorie='$filter_category'";
+}
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -39,6 +44,19 @@ function getActionButton($type, $id) {
             return '<a class="btn btn-outline-dark w-100 mt-auto" href="pages/item.php?id=' . $id . '">Faire une offre</a>';
         default:
             return '<a class="btn btn-outline-dark w-100 mt-auto" href="pages/item.php?id=' . $id . '">Voir les détails</a>';
+    }
+}
+
+function getDescriptionForCategory($category) {
+    switch ($category) {
+        case 'Articles rares':
+            return 'Découvrez notre sélection exclusive d\'articles rares, uniques et précieux.';
+        case 'Articles hautes de gamme':
+            return 'Explorez notre collection d\'articles haut de gamme, luxueux et sophistiqués.';
+        case 'Articles réguliers':
+            return 'Parcourez nos articles réguliers de qualité pour vos besoins quotidiens.';
+        default:
+            return '';
     }
 }
 ?>
@@ -89,6 +107,56 @@ function getActionButton($type, $id) {
         .bottom-aligned {
             margin-top: auto;
         }
+        .category-box {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            margin-bottom: 15px;
+        }
+        .category-title {
+            text-align: center;
+            font-weight: bold;
+        }
+        .category-description {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .filter-box-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .filter-box {
+            display: inline-block;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        .filter-box button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #44977c;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        .filter-box button:hover {
+            background-color: #2d6c59;
+            transform: scale(1.1);
+        }
+        .filter-box button:focus {
+            outline: none;
+        }
+        .filter-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -103,40 +171,128 @@ function getActionButton($type, $id) {
     </div>
 </header>
 
-<!-- Section-->
-<section class="py-5">
-    <div class="container px-4 px-lg-5 mt-5">
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    echo '<div class="col mb-5">';
-                    echo '<div class="card h-100">';
-                    echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
-                    echo '<div class="card-body p-4 d-flex flex-column">';
-                    echo '<div>';
-                    echo '<h5 class="fw-bolder">' . $row['nom'] . '</h5>';
-                    echo '<p class="text-muted">' . $row['categorie'] . '</p>';
-                    echo '<p>' . $row['description'] . '</p>';
-                    echo '<h5>' . $row['prix'] . ' €</h5>';
-                    echo '</div>';
-                    echo '<div class="bottom-aligned w-100">';
-                    echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
-                    echo getActionButton($row['type_de_vente'], $row['id']);
-                    echo '</div>';
-                    echo '</div>';
-                    echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
-                    echo '</div>';
-                    echo '</div>';
-                    echo '</div>';
-                }
-            } else {
-                echo "Aucun produit trouvé.";
-            }
-            ?>
-        </div>
+<!-- Filtre-->
+<div class="container filter-box-container">
+    <div class="filter-box">
+        <p class="filter-title">Filtrer par catégorie :</p>
+        <button onclick="window.location.href='?categorie=Articles rares'">Articles rares</button>
+        <button onclick="window.location.href='?categorie=Articles hautes de gamme'">Articles hautes de gamme</button>
+        <button onclick="window.location.href='?categorie=Articles réguliers'">Articles réguliers</button>
+        <button onclick="window.location.href='?'">Tous les articles</button>
+        <button onclick="window.location.href='?categorie='">Sélection du jour</button>
     </div>
-</section>
+</div>
+
+<!-- Sélection du jour-->
+<?php if (!$filter_category): ?>
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <h2 class="mb-4">Sélection du jour</h2>
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                <?php
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        echo '<div class="col mb-5">';
+                        echo '<div class="card h-100">';
+                        echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
+                        echo '<div class="card-body p-4 d-flex flex-column">';
+                        echo '<div>';
+                        echo '<h5 class="fw-bolder">' . $row['nom'] . '</h5>';
+                        echo '<p class="text-muted">' . $row['categorie'] . '</p>';
+                        echo '<p>' . $row['description'] . '</p>';
+                        echo '<h5>' . $row['prix'] . ' €</h5>';
+                        echo '</div>';
+                        echo '<div class="bottom-aligned w-100">';
+                        echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
+                        echo getActionButton($row['type_de_vente'], $row['id']);
+                        echo '</div>';
+                        echo '</div>';
+                        echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                } else {
+                    echo "Aucun produit trouvé.";
+                }
+                ?>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>
+
+<!-- Articles par catégorie-->
+<?php
+if (!$filter_category) {
+    $categories = ['Articles rares', 'Articles hautes de gamme', 'Articles réguliers'];
+    foreach ($categories as $categorie) {
+        $sql = "SELECT * FROM produits WHERE categorie='$categorie' AND vendu = 0";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            echo '<section class="py-5">';
+            echo '<div class="container px-4 px-lg-5 mt-3 category-box">';
+            echo '<h2 class="category-title">' . $categorie . '</h2>';
+            echo '<p class="category-description">' . getDescriptionForCategory($categorie) . '</p>';
+            echo '<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">';
+            while($row = $result->fetch_assoc()) {
+                echo '<div class="col mb-5">';
+                echo '<div class="card h-100">';
+                echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
+                echo '<div class="card-body p-4 d-flex flex-column">';
+                echo '<div>';
+                echo '<h5 class="fw-bolder">' . $row['nom'] . '</h5>';
+                echo '<p class="text-muted">' . $row['categorie'] . '</p>';
+                echo '<p>' . $row['description'] . '</p>';
+                echo '<h5>' . $row['prix'] . ' €</h5>';
+                echo '</div>';
+                echo '<div class="bottom-aligned w-100">';
+                echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
+                echo getActionButton($row['type_de_vente'], $row['id']);
+                echo '</div>';
+                echo '</div>';
+                echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
+                echo '</div>';
+                echo '</div>';
+                echo '</div>';
+            }
+            echo '</div>';
+            echo '</div>';
+            echo '</section>';
+        }
+    }
+} else {
+    echo '<section class="py-5">';
+    echo '<div class="container px-4 px-lg-5 mt-3 category-box">';
+    echo '<h2 class="category-title">' . $filter_category . '</h2>';
+    echo '<p class="category-description">' . getDescriptionForCategory($filter_category) . '</p>';
+    echo '<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">';
+    while($row = $result->fetch_assoc()) {
+        echo '<div class="col mb-5">';
+        echo '<div class="card h-100">';
+        echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
+        echo '<div class="card-body p-4 d-flex flex-column">';
+        echo '<div>';
+        echo '<h5 class="fw-bolder">' . $row['nom'] . '</h5>';
+        echo '<p class="text-muted">' . $row['categorie'] . '</p>';
+        echo '<p>' . $row['description'] . '</p>';
+        echo '<h5>' . $row['prix'] . ' €</h5>';
+        echo '</div>';
+        echo '<div class="bottom-aligned w-100">';
+        echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
+        echo getActionButton($row['type_de_vente'], $row['id']);
+        echo '</div>';
+        echo '</div>';
+        echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+    echo '</div>';
+    echo '</div>';
+    echo '</section>';
+}
+?>
 
 <!-- Contact Information and Map -->
 <div class="container contact-info">
@@ -158,5 +314,6 @@ function getActionButton($type, $id) {
     </div>
 </div>
 
+<?php include './includes/footer.php'; ?>
 </body>
 </html>
