@@ -51,9 +51,9 @@ include 'includes/navbar.php';
                     <label for="category">Catégorie</label>
                     <select class="form-control" id="category" name="category" required>
                         <option value="">Choisir...</option>
-                        <option value="Meubles et objets d’art">Meubles et objets d’art</option>
-                        <option value="Accessoire VIP">Accessoire VIP</option>
-                        <option value="Matériels scolaires">Matériels scolaires</option>
+                        <option value="Articles rares">Articles rares</option>
+                        <option value="Articles hautes de gamme">Articles hautes de gamme</option>
+                        <option value="Articles réguliers">Articles réguliers</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-success">Soumettre</button>
