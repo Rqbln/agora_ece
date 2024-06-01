@@ -268,19 +268,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <form method="post" action="">
                     <div class="form-group">
                         <label for="card_number">Numéro de carte:</label>
-                        <input type="text" class="form-control" id="card_number" name="card_number" required>
+                        <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Entrez le numéro de carte" required>
                     </div>
                     <div class="form-group">
                         <label for="card_expiry">Date d'expiration:</label>
-                        <input type="date" class="form-control" id="card_expiry" name="card_expiry" required>
+                        <input type="date" class="form-control" id="card_expiry" name="card_expiry" placeholder="Entrez la date d'expiration" required>
                     </div>
                     <div class="form-group">
                         <label for="card_cvc">CVC:</label>
-                        <input type="text" class="form-control" id="card_cvc" name="card_cvc" required>
+                        <input type="text" class="form-control" id="card_cvc" name="card_cvc" placeholder="Entrez le CVC" required>
                     </div>
                     <div class="form-group">
                         <label for="new_address">Se faire livrer à une autre adresse:</label>
-                        <textarea class="form-control" id="new_address" name="new_address"><?php echo htmlspecialchars($user['adresse']); ?></textarea>
+                        <textarea class="form-control" id="new_address" name="new_address" placeholder="Veuillez sélectionner une adresse"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Payer</button>
                 </form>
