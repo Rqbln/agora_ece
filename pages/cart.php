@@ -27,6 +27,11 @@ if (isset($_GET['action']) && $_GET['action'] == "remove") {
 }
 
 $items = array();
+$immediate_items = array();
+$total_ht = 0;
+$total_ttc = 0;
+$tax_rate = 0.20;
+
 if (count($_SESSION['cart']) > 0) {
     $ids = implode(',', $_SESSION['cart']);
     $sql = "SELECT * FROM produits WHERE id IN ($ids)";
@@ -38,7 +43,14 @@ if (count($_SESSION['cart']) > 0) {
 
     while ($row = $result->fetch_assoc()) {
         $items[] = $row;
+        if ($row['type_de_vente'] == 'vente_immediate') {
+            $immediate_items[] = $row;
+            $total_ttc += $row['prix'];
+        }
     }
+
+    $total_ht = $total_ttc / (1 + $tax_rate);
+    $tax = $total_ttc - $total_ht;
 }
 ?>
 
@@ -66,6 +78,13 @@ if (count($_SESSION['cart']) > 0) {
         }
         .btn-danger:hover {
             background-color: #c82333;
+        }
+        .summary-box {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -95,6 +114,16 @@ if (count($_SESSION['cart']) > 0) {
                 }
                 ?>
             </div>
+            <?php if (count($immediate_items) > 0): ?>
+                <div class="summary-box">
+                    <h4>Récapitulatif</h4>
+                    <p><i> -- Procéder au paiement des articles du panier en "Achat Immédiat" --</i></p>
+                    <p>Sous-total HT : <?php echo number_format($total_ht, 2); ?> €</p>
+                    <p>Taxe (20%) : <?php echo number_format($tax, 2); ?> €</p>
+                    <p><strong>Total TTC : <?php echo number_format($total_ttc, 2); ?> €</strong></p>
+                    <a href="payment.php?action=pay_all_immediate" class="btn btn-primary">Payer tous les articles immédiats</a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
     <?php include '../includes/footer.php'; ?>

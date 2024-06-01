@@ -25,6 +25,8 @@ if ($result_user->num_rows > 0) {
 }
 
 $produit_id = isset($_GET['id']) ? $_GET['id'] : null;
+$produits = [];
+$prix_total_ttc = 0;
 
 if ($produit_id) {
     $sql_produit = "SELECT * FROM produits WHERE id='$produit_id' AND vendu=0";
@@ -38,22 +40,23 @@ if ($produit_id) {
         die("Produit non trouvé ou déjà vendu.");
     }
 } else {
-    $sql_cart = "
-        SELECT p.*, cp.quantite 
-        FROM panier_produits cp 
-        JOIN produits p ON cp.produit_id = p.id 
-        WHERE cp.panier_id = (SELECT id FROM paniers WHERE utilisateur_id = '$user_id')
-    ";
-    $result_cart = $conn->query($sql_cart);
+    if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
+        $ids = implode(',', $_SESSION['cart']);
+        $sql_cart = "SELECT * FROM produits WHERE id IN ($ids)";
+        $result_cart = $conn->query($sql_cart);
 
-    if ($result_cart->num_rows == 0) {
+        if ($result_cart->num_rows > 0) {
+            while ($produit = $result_cart->fetch_assoc()) {
+                if ($produit['type_de_vente'] == 'vente_immediate') {
+                    $produits[] = $produit;
+                    $prix_total_ttc += $produit['prix'];
+                }
+            }
+        } else {
+            die("Aucun produit dans le panier.");
+        }
+    } else {
         die("Aucun produit dans le panier.");
-    }
-
-    $prix_total_ttc = 0;
-    while ($produit = $result_cart->fetch_assoc()) {
-        $produits[] = $produit;
-        $prix_total_ttc += $produit['prix'] * $produit['quantite'];
     }
 }
 
@@ -121,8 +124,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Vider le panier si la commande provient du panier
                     if (!$produit_id) {
-                        $sql_vider_panier = "DELETE FROM panier_produits WHERE panier_id = (SELECT id FROM paniers WHERE utilisateur_id = '$user_id')";
-                        $conn->query($sql_vider_panier);
+                        foreach ($produits as $produit) {
+                            if (($key = array_search($produit['id'], $_SESSION['cart'])) !== false) {
+                                unset($_SESSION['cart'][$key]);
+                            }
+                        }
                     }
 
                     $message = "<div class='alert alert-success' role='alert'>Paiement réussi. Votre commande a été passée.</div>";
