@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = $_POST['price'] ?? null;
     $saleType = $_POST['saleType'] ?? null;
     $category = $_POST['category'] ?? null;
-    $vendeur_id = 1;  // Supposons que l'ID du vendeur est connu ou récupéré par session.
+    $vendeur_id = 4;  // Supposons que l'ID du vendeur est connu ou récupéré par session.
 
     // Chemin par défaut pour l'image si aucune n'est téléchargée
     $defaultImagePath = "assets/img/new_products/default.jpg";

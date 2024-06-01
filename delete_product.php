@@ -19,7 +19,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = 4;
 $is_admin = false;
 
 // Récupérer le rôle de l'utilisateur connecté
@@ -35,28 +35,41 @@ if ($result_user->num_rows > 0) {
 }
 $stmt_user->close();
 
-// Vérifier si l'utilisateur est administrateur
-if (!$is_admin) {
-    $error = "Vous n'avez pas l'autorisation nécessaire.";
-} else {
-    // Procéder à la suppression si l'ID du produit est fourni et si l'utilisateur est administrateur
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
-        $product_id = $_POST['product_id'];
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
+    $product_id = $_POST['product_id'];
 
-        $sql_delete = "DELETE FROM produits WHERE id = ?";
-        $stmt_delete = $conn->prepare($sql_delete);
-        $stmt_delete->bind_param("i", $product_id);
-        $stmt_delete->execute();
+    // Vérifier si le produit appartient à l'utilisateur ou si l'utilisateur est un administrateur
+    $sql_product = "SELECT vendeur_id FROM produits WHERE id = ?";
+    $stmt_product = $conn->prepare($sql_product);
+    $stmt_product->bind_param("i", $product_id);
+    $stmt_product->execute();
+    $result_product = $stmt_product->get_result();
 
-        if ($stmt_delete->affected_rows > 0) {
-            $message = "Produit supprimé avec succès.";
+    if ($result_product->num_rows > 0) {
+        $product = $result_product->fetch_assoc();
+        $vendeur_id = $product['vendeur_id'];
+        if ($is_admin || intval($vendeur_id) === intval($user_id)) {
+            // Procéder à la suppression du produit
+            $sql_delete = "DELETE FROM produits WHERE id = ?";
+            $stmt_delete = $conn->prepare($sql_delete);
+            $stmt_delete->bind_param("i", $product_id);
+            $stmt_delete->execute();
+
+            if ($stmt_delete->affected_rows > 0) {
+                $message = "Produit supprimé avec succès.";
+            } else {
+                $error = "Erreur lors de la suppression du produit. Il est possible que le produit n'existe pas ou a déjà été supprimé.";
+            }
+            $stmt_delete->close();
         } else {
-            $error = "Erreur lors de la suppression du produit. Il est possible que le produit n'existe pas ou a déjà été supprimé.";
+            $error = "Vous n'avez pas l'autorisation nécessaire pour supprimer ce produit.";
         }
-        $stmt_delete->close();
     } else {
-        $error = "Demande invalide ou identifiant du produit non fourni.";
+        $error = "Produit non trouvé.";
     }
+    $stmt_product->close();
+} else {
+    $error = "Demande invalide ou identifiant du produit non fourni.";
 }
 ?>
 
@@ -83,6 +96,5 @@ if (!$is_admin) {
     <?php endif; ?>
     <a href="agora_ece/index.php" class="btn btn-primary">Retour à l'accueil</a>
 </div>
-<?php include 'includes/footer.php'; ?>
 </body>
 </html>

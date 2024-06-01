@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include 'includes/db.php';
+include './includes/db.php';
 session_start();
 
 if (!isset($conn)) {
@@ -13,16 +13,18 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+
 $user_id = $_SESSION['user_id'];
 $is_admin = false;
 
 // Récupérer les informations de l'utilisateur connecté
-$sql_user = "SELECT role FROM utilisateurs WHERE id='$user_id'";
+$sql_user = "SELECT role, email FROM utilisateurs WHERE id='$user_id'";
 $result_user = $conn->query($sql_user);
 
 if ($result_user->num_rows > 0) {
     $user = $result_user->fetch_assoc();
     $is_admin = ($user['role'] == 'administrateur');
+    $vendeur_id = explode('@', $user['email'])[0]; // Extraire le vendeur_id à partir de l'email
 } else {
     echo "<div class='alert alert-danger' role='alert'>Utilisateur non trouvé.</div>";
     exit();
@@ -30,10 +32,13 @@ if ($result_user->num_rows > 0) {
 
 $filter_category = $_GET['categorie'] ?? '';
 
-$sql = "SELECT * FROM produits WHERE vendu = 0";
+$sql = "SELECT p.*, SUBSTRING_INDEX(p.vendeur_id, '@', 1) AS vendeur_nom 
+        FROM produits p 
+        WHERE p.vendu = 0";
+
 if ($filter_category) {
     $filter_category = $conn->real_escape_string($filter_category);
-    $sql .= " AND categorie='$filter_category'";
+    $sql .= " AND p.categorie='$filter_category'";
 }
 $result = $conn->query($sql);
 
@@ -81,6 +86,51 @@ function getDescriptionForCategory($category): string
         default:
             return '';
     }
+}
+
+function displayProducts($result, $is_admin, $user_id)
+{
+    while ($row = $result->fetch_assoc()) {
+        echo '<div class="col mb-5">';
+        echo '<div class="card h-100">';
+        $imagePath = (strpos($row['image_url'], 'http') === 0) ? htmlspecialchars($row['image_url']) : 'path/to/default/image.jpg';
+        echo '<img class="card-img-top" src="' . $imagePath . '" alt="' . htmlspecialchars($row['nom']) . '">';
+        echo '<div class="card-body p-4 d-flex flex-column">';
+        echo '<div>';
+        echo '<h5 class="fw-bolder">' . htmlspecialchars($row['nom']) . '</h5>';
+        echo '<p class="text-muted">' . htmlspecialchars($row['categorie']) . '</p>';
+        echo '<p>' . htmlspecialchars($row['description']) . '</p>';
+        echo '<h5>' . htmlspecialchars($row['prix']) . ' €</h5>';
+        echo '</div>';
+        echo '<div class="bottom-aligned w-100">';
+        echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
+        echo getActionButton($row['type_de_vente'], $row['id']);
+        echo '<div class="mt-2">';
+        echo '<form action="/delete_product.php" method="post">';
+        echo '<input type="hidden" name="product_id" value="' . htmlspecialchars($row['id']) . '">';
+        echo '<button type="submit" class="btn btn-outline-dark w-100 mt-auto">Supprimer</button>';
+        echo '</form>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+}
+
+function displayCategoryProducts($categorie, $result, $is_admin, $user_id)
+{
+    echo '<section class="py-5">';
+    echo '<div class="container px-4 px-lg-5 mt-3 category-box">';
+    echo '<h2 class="category-title">' . htmlspecialchars($categorie) . '</h2>';
+    echo '<p class="category-description">' . getDescriptionForCategory($categorie) . '</p>';
+    echo '<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">';
+    displayProducts($result, $is_admin, $user_id);
+    echo '</div>';
+    echo '</div>';
+    echo '</section>';
 }
 ?>
 
@@ -203,51 +253,14 @@ function getDescriptionForCategory($category): string
 </div>
 
 <!-- Sélection du jour-->
-<?php /**
- * @param $result
- * @param bool $is_admin
- * @return void
- */
-function extracted1($result, bool $is_admin)
-{
-    while ($row = $result->fetch_assoc()) {
-        echo '<div class="col mb-5">';
-        echo '<div class="card h-100">';
-        $imagePath = (strpos($row['image_url'], 'http') === 0) ? htmlspecialchars($row['image_url']) : 'path/to/default/image.jpg';
-        echo '<img class="card-img-top" src="' . $imagePath . '" alt="' . htmlspecialchars($row['nom']) . '">';
-        echo '<div class="card-body p-4 d-flex flex-column">';
-        echo '<div>';
-        echo '<h5 class="fw-bolder">' . htmlspecialchars($row['nom']) . '</h5>';
-        echo '<p class="text-muted">' . htmlspecialchars($row['categorie']) . '</p>';
-        echo '<p>' . htmlspecialchars($row['description']) . '</p>';
-        echo '<h5>' . htmlspecialchars($row['prix']) . ' €</h5>';
-        echo '</div>';
-        echo '<div class="bottom-aligned w-100">';
-        echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
-        echo getActionButton($row['type_de_vente'], $row['id']);
-        if ($is_admin) {
-            echo '<form action="/delete_product.php" method="post">';
-            echo '<input type="hidden" name="product_id" value="' . htmlspecialchars($row['id']) . '">';
-            echo '<button type="submit" class="btn btn-danger mt-2">Supprimer</button>';
-            echo '</form>';
-        }
-        echo '</div>';
-        echo '</div>';
-        echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
-        echo '</div>';
-        echo '</div>';
-        echo '</div>';
-    }
-}
-
-if (!$filter_category): ?>
+<?php if (!$filter_category): ?>
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
             <h2 class="mb-4">Sélection du jour</h2>
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                 <?php
                 if ($result->num_rows > 0) {
-                    extracted1($result, $is_admin);
+                    displayProducts($result, $is_admin, $user_id);
                 } else {
                     echo "<p>Aucun produit trouvé.</p>";
                 }
@@ -259,31 +272,20 @@ if (!$filter_category): ?>
 
 <!-- Articles par catégorie-->
 <?php
-function extracted(string $categorie, $result, $is_admin)
-{
-    echo '<section class="py-5">';
-    echo '<div class="container px-4 px-lg-5 mt-3 category-box">';
-    echo '<h2 class="category-title">' . htmlspecialchars($categorie) . '</h2>';
-    echo '<p class="category-description">' . getDescriptionForCategory($categorie) . '</p>';
-    echo '<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">';
-    extracted1($result, $is_admin);
-    echo '</div>';
-    echo '</div>';
-    echo '</section>';
-}
-
 if (!$filter_category) {
     $categories = ['Articles rares', 'Articles hautes de gamme', 'Articles réguliers'];
     foreach ($categories as $categorie) {
-        $sql = "SELECT * FROM produits WHERE categorie='$categorie' AND vendu = 0";
+        $sql = "SELECT p.*, SUBSTRING_INDEX(p.vendeur_id, '@', 1) AS vendeur_nom 
+                FROM produits p 
+                WHERE p.categorie='$categorie' AND p.vendu = 0";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
-            extracted($categorie, $result, $is_admin);
+            displayCategoryProducts($categorie, $result, $is_admin, $user_id);
         }
     }
 } else {
-    extracted($filter_category, $result, $is_admin);
+    displayCategoryProducts($filter_category, $result, $is_admin, $user_id);
 }
 ?>
 
