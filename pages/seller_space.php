@@ -79,9 +79,6 @@ if ($user['role'] == 'acheteur') {
             max-width: 800px;
             margin-top: 50px;
         }
-        .card {
-            margin-bottom: 20px;
-        }
         .alert-success {
             background-color: #d4edda;
             border-color: #c3e6cb;
@@ -150,7 +147,40 @@ if ($user['role'] == 'acheteur') {
                     <?php else: ?>
                         <p>Aucune demande en attente.</p>
                     <?php endif; ?>
+
+                    <h2>Gérer les vendeurs</h2>
+                    <?php
+                    $sql_vendeurs = "SELECT id, nom, email FROM utilisateurs WHERE role = 'vendeur'";
+                    $result_vendeurs = $conn->query($sql_vendeurs);
+                    if ($result_vendeurs->num_rows > 0): ?>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php while ($vendeur = $result_vendeurs->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($vendeur['nom']); ?></td>
+                                    <td><?= htmlspecialchars($vendeur['email']); ?></td>
+                                    <td>
+                                        <form method="post" action="process_vendeur.php">
+                                            <input type="hidden" name="vendeur_id" value="<?= $vendeur['id']; ?>">
+                                            <button type="submit" name="action" value="demote" class="btn btn-warning">Rétrograder</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>Aucun vendeur à gérer.</p>
+                    <?php endif; ?>
                 <?php endif; ?>
+
             <?php endif; ?>
         </div>
     </div>
