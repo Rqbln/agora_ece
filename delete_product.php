@@ -81,7 +81,7 @@ if (!$is_admin) {
             <?php echo $error; ?>
         </div>
     <?php endif; ?>
-    <a href="/index.php" class="btn btn-primary">Retour à l'accueil</a>
+    <a href="agora_ece/index.php" class="btn btn-primary">Retour à l'accueil</a>
 </div>
 <?php include 'includes/footer.php'; ?>
 </body>
