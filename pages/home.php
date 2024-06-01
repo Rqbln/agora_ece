@@ -9,7 +9,7 @@ if (!isset($conn)) {
     die("La connexion à la base de données n'est pas définie.");
 }
 
-$filter_category = isset($_GET['categorie']) ? $_GET['categorie'] : '';
+$filter_category = $_GET['categorie'] ?? '';
 
 $sql = "SELECT * FROM produits WHERE vendu = 0";
 if ($filter_category) {
@@ -21,7 +21,8 @@ if (!$result) {
     die("Erreur lors de l'exécution de la requête : " . $conn->error);
 }
 
-function getTypeDeVente($type) {
+function getTypeDeVente($type): string
+{
     switch ($type) {
         case 'vente_immediate':
             return 'Vente immédiate';
@@ -34,7 +35,8 @@ function getTypeDeVente($type) {
     }
 }
 
-function getActionButton($type, $id) {
+function getActionButton($type, $id): string
+{
     switch ($type) {
         case 'vente_immediate':
             return '<a class="btn btn-outline-dark w-100 mt-auto" href="pages/payment.php?id=' . $id . '">Acheter maintenant</a>';
@@ -47,7 +49,8 @@ function getActionButton($type, $id) {
     }
 }
 
-function getDescriptionForCategory($category) {
+function getDescriptionForCategory($category): string
+{
     switch ($category) {
         case 'Articles rares':
             return 'Découvrez notre sélection exclusive d\'articles rares, uniques et précieux.';
@@ -228,51 +231,19 @@ function getDescriptionForCategory($category) {
 
 <!-- Articles par catégorie-->
 <?php
-if (!$filter_category) {
-    $categories = ['Articles rares', 'Articles hautes de gamme', 'Articles réguliers'];
-    foreach ($categories as $categorie) {
-        $sql = "SELECT * FROM produits WHERE categorie='$categorie' AND vendu = 0";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            echo '<section class="py-5">';
-            echo '<div class="container px-4 px-lg-5 mt-3 category-box">';
-            echo '<h2 class="category-title">' . $categorie . '</h2>';
-            echo '<p class="category-description">' . getDescriptionForCategory($categorie) . '</p>';
-            echo '<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">';
-            while($row = $result->fetch_assoc()) {
-                echo '<div class="col mb-5">';
-                echo '<div class="card h-100">';
-                echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
-                echo '<div class="card-body p-4 d-flex flex-column">';
-                echo '<div>';
-                echo '<h5 class="fw-bolder">' . $row['nom'] . '</h5>';
-                echo '<p class="text-muted">' . $row['categorie'] . '</p>';
-                echo '<p>' . $row['description'] . '</p>';
-                echo '<h5>' . $row['prix'] . ' €</h5>';
-                echo '</div>';
-                echo '<div class="bottom-aligned w-100">';
-                echo '<div class="vente-type mb-2">' . getTypeDeVente($row['type_de_vente']) . '</div>';
-                echo getActionButton($row['type_de_vente'], $row['id']);
-                echo '</div>';
-                echo '</div>';
-                echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            }
-            echo '</div>';
-            echo '</div>';
-            echo '</section>';
-        }
-    }
-} else {
+/**
+ * @param string $categorie
+ * @param $result
+ * @return void
+ */
+function extracted(string $categorie, $result)
+{
     echo '<section class="py-5">';
     echo '<div class="container px-4 px-lg-5 mt-3 category-box">';
-    echo '<h2 class="category-title">' . $filter_category . '</h2>';
-    echo '<p class="category-description">' . getDescriptionForCategory($filter_category) . '</p>';
+    echo '<h2 class="category-title">' . $categorie . '</h2>';
+    echo '<p class="category-description">' . getDescriptionForCategory($categorie) . '</p>';
     echo '<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">';
-    while($row = $result->fetch_assoc()) {
+    while ($row = $result->fetch_assoc()) {
         echo '<div class="col mb-5">';
         echo '<div class="card h-100">';
         echo '<img class="card-img-top" src="' . $row['image_url'] . '" alt="' . $row['nom'] . '">';
@@ -296,6 +267,20 @@ if (!$filter_category) {
     echo '</div>';
     echo '</div>';
     echo '</section>';
+}
+
+if (!$filter_category) {
+    $categories = ['Articles rares', 'Articles hautes de gamme', 'Articles réguliers'];
+    foreach ($categories as $categorie) {
+        $sql = "SELECT * FROM produits WHERE categorie='$categorie' AND vendu = 0";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            extracted($categorie, $result);
+        }
+    }
+} else {
+    extracted($filter_category, $result);
 }
 ?>
 
