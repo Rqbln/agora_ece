@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS cartes_credit (
                                              id INT AUTO_INCREMENT PRIMARY KEY,
                                              numero_carte VARCHAR(16) NOT NULL,
                                              date_expiration DATE NOT NULL,
-                                             cvv VARCHAR(4) NOT NULL
+                                             cvv VARCHAR(4) NOT NULL,
+                                             limite_carte DECIMAL(10, 2) NOT NULL  -- Ajout du champ limite_carte
 );
 
 -- Création de la table utilisateurs
@@ -192,10 +193,8 @@ VALUES
     ('Hub Domotique', 'Hub domotique pour contrôler vos appareils connectés.', 129.99, 'https://pixabay.com/get/g17a12881e68c9e4b85d13e9d9b9b3f4a007c1a55bce1182d61741895d217f66e009c1d61b41b7a2e897d60ba17f88e37_450x300.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', 2),
     ('Brosse à Dents Électrique', 'Brosse à dents électrique avec plusieurs modes.', 49.99, 'https://pixabay.com/get/gd5e0cfdf009fa29e7edfbff152f47e507cd4515b4566a58e64e1870989af381e573e431df5dc47052470d8e3ffba24f8_450x300.jpg', 'Articles réguliers', 'vente_immediate', 2),
     ('Projecteur Portable', 'Projecteur portable avec haut-parleur intégré.', 199.99, 'https://pixabay.com/get/gd30790aefc61ed15ef86b5b6c0182c6bfa45a76806f17c9ed90afad72b29b9ff510c24979918c2e5862be1fc7c1f2e4b_450x300.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', 2),
-    ('Tire-bouchon Électrique', 'Tire-bouchon électrique rechargeable.', 29.99, 'https://pixabay.com/get/gb5e9a8ba5c26450f5f2e46b92c028c7f417d6e6db1d6c4d9e59885d1f550312ab45c1235ec527d1d9b9de351d924bf9a_450x300.jpg', 'Articles réguliers', 'vente_immediate', 2),
-    ('Vélo Électrique Pliable', 'Vélo électrique pliable pour un transport facile.', 699.99, 'https://pixabay.com/get/g8b6b10a3c742d7cbe2b2446bb3929b3bcde10e2e33b0f037b19962b2439e1b2e2d5b34c70f6f8fdb9a0978b57076d2fa_450x300.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', 2),
-    ('Aspirateur Robot', 'Aspirateur robot avec programmation et application mobile.', 299.99, 'https://pixabay.com/get/g9e982d54b728d39a76ddc10df6e5e1e1b250f75cc83219a0d7e2ed86da3fda9314dc2120f835b0a62b01cc0d97b9148d_450x300.jpg', 'Articles hautes de gamme', 'vente_meilleure_offre', 2);
+    ('Tire-bouchon Électrique', 'Tire-bouchon électrique rechargeable.', 29.99, 'https://pixabay.com/get/gb5e9a8ba5c26450f5f2e46b92c028c7f417d6e6db1d6c4d9e59885d1f550312ab45c1235ec527d1d9b9de351d924bf9a_450x300.jpg', 'Articles réguliers', 'vente_immediate', 2);
 
 -- Insertion d'une carte de crédit fictive
-INSERT INTO cartes_credit (numero_carte, date_expiration, cvv)
-VALUES ('1234567812345678', '2025-12-31', '123');
+INSERT INTO cartes_credit (numero_carte, date_expiration, cvv, limite_carte)
+VALUES ('1234567812345678', '2025-12-31', '123', 5000.00);

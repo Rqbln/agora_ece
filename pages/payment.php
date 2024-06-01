@@ -79,52 +79,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         // Carte de crédit valide
+        $card = $result->fetch_assoc();
 
-        // Créer une commande
-        $sql_commande = "INSERT INTO commandes (utilisateur_id, status) VALUES ('$user_id', 'en_attente')";
-        if ($conn->query($sql_commande) === TRUE) {
-            $commande_id = $conn->insert_id;
+        // Vérifier la limite de la carte
+        $card_limit = $card['limite_carte'];
+        if ($prix_total_ttc > $card_limit) {
+            $message = "<div class='alert alert-danger' role='alert'>Le paiement a échoué. La limite de la carte est dépassée.</div>";
+        } else {
+            // Créer une commande
+            $sql_commande = "INSERT INTO commandes (utilisateur_id, status) VALUES ('$user_id', 'en_attente')";
+            if ($conn->query($sql_commande) === TRUE) {
+                $commande_id = $conn->insert_id;
 
-            // Ajouter les produits à la commande
-            foreach ($produits as $produit) {
-                $sql_commande_produit = "INSERT INTO commande_produits (commande_id, produit_id, quantite) VALUES ('$commande_id', '{$produit['id']}', 1)";
-                if ($conn->query($sql_commande_produit) !== TRUE) {
-                    $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'ajout du produit à la commande : " . $conn->error . "</div>";
-                    break;
-                }
-            }
-
-            // Enregistrer le paiement
-            $sql_paiement = "INSERT INTO paiements (commande_id, montant, type, statut) VALUES ('$commande_id', '$prix_total_ttc', 'carte', 'complet')";
-            if ($conn->query($sql_paiement) === TRUE) {
-
-                // Mettre à jour les produits comme vendus et attribuer l'email de l'acheteur
+                // Ajouter les produits à la commande
                 foreach ($produits as $produit) {
-                    $sql_update_produit = "UPDATE produits SET vendu=1, acheteur_email='{$user['email']}' WHERE id='{$produit['id']}'";
-                    if ($conn->query($sql_update_produit) !== TRUE) {
-                        $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la mise à jour du produit : " . $conn->error . "</div>";
+                    $sql_commande_produit = "INSERT INTO commande_produits (commande_id, produit_id, quantite) VALUES ('$commande_id', '{$produit['id']}', 1)";
+                    if ($conn->query($sql_commande_produit) !== TRUE) {
+                        $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'ajout du produit à la commande : " . $conn->error . "</div>";
                         break;
                     }
                 }
 
-                // Mettre à jour l'adresse de livraison si différente
-                if ($new_address != $user['adresse']) {
-                    $sql_update_address = "UPDATE utilisateurs SET adresse='$new_address' WHERE id='$user_id'";
-                    $conn->query($sql_update_address);
-                }
+                // Enregistrer le paiement
+                $sql_paiement = "INSERT INTO paiements (commande_id, montant, type, statut) VALUES ('$commande_id', '$prix_total_ttc', 'carte', 'complet')";
+                if ($conn->query($sql_paiement) === TRUE) {
 
-                // Vider le panier si la commande provient du panier
-                if (!$produit_id) {
-                    $sql_vider_panier = "DELETE FROM panier_produits WHERE panier_id = (SELECT id FROM paniers WHERE utilisateur_id = '$user_id')";
-                    $conn->query($sql_vider_panier);
-                }
+                    // Mettre à jour les produits comme vendus et attribuer l'email de l'acheteur
+                    foreach ($produits as $produit) {
+                        $sql_update_produit = "UPDATE produits SET vendu=1, acheteur_email='{$user['email']}' WHERE id='{$produit['id']}'";
+                        if ($conn->query($sql_update_produit) !== TRUE) {
+                            $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la mise à jour du produit : " . $conn->error . "</div>";
+                            break;
+                        }
+                    }
 
-                $message = "<div class='alert alert-success' role='alert'>Paiement réussi. Votre commande a été passée.</div>";
+                    // Mettre à jour l'adresse de livraison si différente
+                    if ($new_address != $user['adresse']) {
+                        $sql_update_address = "UPDATE utilisateurs SET adresse='$new_address' WHERE id='$user_id'";
+                        $conn->query($sql_update_address);
+                    }
+
+                    // Vider le panier si la commande provient du panier
+                    if (!$produit_id) {
+                        $sql_vider_panier = "DELETE FROM panier_produits WHERE panier_id = (SELECT id FROM paniers WHERE utilisateur_id = '$user_id')";
+                        $conn->query($sql_vider_panier);
+                    }
+
+                    $message = "<div class='alert alert-success' role='alert'>Paiement réussi. Votre commande a été passée.</div>";
+                } else {
+                    $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement du paiement : " . $conn->error . "</div>";
+                }
             } else {
-                $message = "<div class='alert alert-danger' role='alert'>Erreur lors de l'enregistrement du paiement : " . $conn->error . "</div>";
+                $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la création de la commande : " . $conn->error . "</div>";
             }
-        } else {
-            $message = "<div class='alert alert-danger' role='alert'>Erreur lors de la création de la commande : " . $conn->error . "</div>";
         }
     } else {
         // Carte de crédit non valide

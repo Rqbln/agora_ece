@@ -41,8 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
     $numero_carte = $_POST['numero_carte'];
     $date_expiration = $_POST['date_expiration'];
     $cvv = $_POST['cvv'];
+    $limite_carte = $_POST['limite_carte'];
 
-    $sql_insert_card = "INSERT INTO cartes_credit (numero_carte, date_expiration, cvv) VALUES ('$numero_carte', '$date_expiration', '$cvv')";
+    $sql_insert_card = "INSERT INTO cartes_credit (numero_carte, date_expiration, cvv, limite_carte) VALUES ('$numero_carte', '$date_expiration', '$cvv', '$limite_carte')";
     if ($conn->query($sql_insert_card) === TRUE) {
         $carte_id = $conn->insert_id;
         $sql_update_user = "UPDATE utilisateurs SET carte_id = '$carte_id' WHERE id = '$user_id'";
@@ -160,6 +161,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
                     <label for="cvv">CVC:</label>
                     <input type="text" class="form-control" id="cvv" name="cvv" required>
                 </div>
+                <div class="form-group">
+                    <label for="limite_carte">Limite de la carte:</label>
+                    <input type="number" step="0.01" class="form-control" id="limite_carte" name="limite_carte" required>
+                </div>
                 <button type="submit" name="add_card" class="btn btn-primary mt-3">Enregistrer la carte</button>
             </form>
             <h2 class="mt-5">Carte de crédit enregistrée</h2>
@@ -173,6 +178,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_card'])) {
                             <?php
                             echo substr($card['numero_carte'], 0, 4) . str_repeat('*', 12);
                             ?>
+                        </p>
+                        <p class="card-text">
+                            Limite de la carte: <?php echo htmlspecialchars($card['limite_carte']); ?> €
                         </p>
                     </div>
                 <?php endwhile; ?>
