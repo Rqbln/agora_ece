@@ -146,11 +146,7 @@ function getDescriptionForCategory($category): string
             margin-top: 10px;
             font-style: italic;
         }
-        .filter-box-container {
-            display: flex;
-            justify-content: center;
-            margin: 30px 0;
-        }
+
         .filter-box {
             display: inline-block;
             border: 1px solid #ddd;
@@ -195,7 +191,7 @@ function getDescriptionForCategory($category): string
 </header>
 
 <!-- Filtre-->
-<div class="container filter-box-container">
+<div class="d-flex justify-content-center my-5">
     <div class="filter-box">
         <p class="filter-title">Filtrer par catégorie :</p>
         <button onclick="window.location.href='?categorie=Articles rares'">Articles rares</button>
