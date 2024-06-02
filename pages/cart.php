@@ -55,7 +55,7 @@ if (count($_SESSION['cart']) > 0) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,6 +86,24 @@ if (count($_SESSION['cart']) > 0) {
             background-color: #f8f9fa;
             margin-top: 20px;
         }
+        .category-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #44977c;
+            color: white;
+            font-size: 0.875em;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .remove-btn {
+            margin-top: 10px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -99,12 +117,17 @@ if (count($_SESSION['cart']) > 0) {
                     foreach ($items as $item) {
                         echo '<div class="col-md-4 cart-item">';
                         echo '<div class="card">';
-                        echo '<img src="' . $item['image_url'] . '" class="card-img-top" alt="' . $item['nom'] . '">';
+                        echo '<img src="' . $item['image_url'] . '" class="card-img-top" alt="' . htmlspecialchars($item['nom']) . '">';
                         echo '<div class="card-body">';
-                        echo '<h5 class="card-title">' . $item['nom'] . '</h5>';
-                        echo '<p class="card-text">' . $item['description'] . '</p>';
-                        echo '<p class="card-text">Prix: ' . $item['prix'] . ' €</p>';
-                        echo '<a href="cart.php?action=remove&id=' . $item['id'] . '" class="btn btn-danger">Retirer</a>';
+                        echo '<h5 class="card-title">' . htmlspecialchars($item['nom']) . '</h5>';
+                        echo '<p class="card-text">' . htmlspecialchars($item['description']) . '</p>';
+                        echo '<p class="card-text">Prix: ' . htmlspecialchars($item['prix']) . ' €</p>';
+                        echo '<div class="category-badge">' . htmlspecialchars($item['categorie']) . '</div>';
+                        if ($item['type_de_vente'] == 'vente_immediate') {
+                            echo '<div class="button-container">';
+                            echo '<a href="cart.php?action=remove&id=' . $item['id'] . '" class="btn btn-danger remove-btn">Retirer</a>';
+                            echo '</div>';
+                        }
                         echo '</div>';
                         echo '</div>';
                         echo '</div>';
