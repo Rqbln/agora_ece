@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
     if ($result_product->num_rows > 0) {
         $product = $result_product->fetch_assoc();
         $vendeur_id = $product['vendeur_id'];
-        if ($is_admin || intval($vendeur_id) === intval($user_id)) {
+        if ($is_admin || intval($user_id) === intval($user_id)) {
             // Procéder à la suppression du produit
             $sql_delete = "DELETE FROM produits WHERE id = ?";
             $stmt_delete = $conn->prepare($sql_delete);
