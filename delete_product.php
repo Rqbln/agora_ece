@@ -21,6 +21,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = 4;
 $is_admin = false;
+$role = '';
 
 // Récupérer le rôle de l'utilisateur connecté
 $sql_user = "SELECT role FROM utilisateurs WHERE id = ?";
@@ -31,7 +32,8 @@ $result_user = $stmt_user->get_result();
 
 if ($result_user->num_rows > 0) {
     $user = $result_user->fetch_assoc();
-    $is_admin = ($user['role'] == 'administrateur');
+    $role = $user['role'];
+    $is_admin = ($role == 'administrateur');
 }
 $stmt_user->close();
 

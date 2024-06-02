@@ -91,9 +91,11 @@ function getDescriptionForCategory($category): string
 function displayProducts($result, $is_admin, $user_id)
 {
     while ($row = $result->fetch_assoc()) {
+        $product_vendeur_id = explode('@', $row['vendeur_id'])[0];
+
         echo '<div class="col mb-5">';
         echo '<div class="card h-100">';
-        $imagePath = (strpos($row['image_url'], 'http') === 0) ? htmlspecialchars($row['image_url']) : 'path/to/default/image.jpg';
+        $imagePath = (strpos($row['image_url'], 'http') === 0) ? htmlspecialchars($row['image_url']) : '' . htmlspecialchars($row['image_url']);
         echo '<img class="card-img-top" src="' . $imagePath . '" alt="' . htmlspecialchars($row['nom']) . '">';
         echo '<div class="card-body p-4 d-flex flex-column">';
         echo '<div>';
@@ -111,12 +113,14 @@ function displayProducts($result, $is_admin, $user_id)
         echo '<button type="submit" class="btn btn-success w-100 mt-auto">Ajouter au panier</button>';
         echo '</form>';
         echo '</div>';
-        echo '<div class="mt-2">';
-        echo '<form action="/delete_product.php" method="post">';
-        echo '<input type="hidden" name="product_id" value="' . htmlspecialchars($row['id']) . '">';
-        echo '<button type="submit" class="btn btn-outline-dark w-100 mt-auto">Supprimer</button>';
-        echo '</form>';
-        echo '</div>';
+        if ($is_admin || intval($product_vendeur_id) === 4) {
+            echo '<div class="mt-2">';
+            echo '<form action="/delete_product.php" method="post">';
+            echo '<input type="hidden" name="product_id" value="' . htmlspecialchars($row['id']) . '">';
+            echo '<button type="submit" class="btn btn-danger w-100 mt-auto">Supprimer</button>';
+            echo '</form>';
+            echo '</div>';
+        }
         echo '</div>';
         echo '</div>';
         echo '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
@@ -125,6 +129,8 @@ function displayProducts($result, $is_admin, $user_id)
         echo '</div>';
     }
 }
+
+
 
 function displayCategoryProducts($categorie, $result, $is_admin, $user_id)
 {
