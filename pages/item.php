@@ -38,6 +38,7 @@ unset($_SESSION['negotiation_message']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($row['nom']); ?></title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         .product-container {
             margin-top: 50px;
@@ -69,6 +70,9 @@ unset($_SESSION['negotiation_message']);
             display: none;
             margin-top: 20px;
         }
+        .alert-info {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -90,7 +94,9 @@ unset($_SESSION['negotiation_message']);
     <div class="row product-actions">
         <div class="col-md-6 offset-md-3 text-center">
             <a href="cart.php?action=add&id=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-primary">Ajouter au panier</a>
-            <button id="negotiate-button" class="btn btn-secondary" onclick="showNegotiationForm()">Négocier le prix</button>
+            <?php if ($row['type_de_vente'] == 'vente_negociation'): ?>
+                <button id="negotiate-button" class="btn btn-secondary" onclick="showNegotiationForm()">Négocier le prix</button>
+            <?php endif; ?>
             <?php if ($row['type_de_vente'] == 'vente_meilleure_offre'): ?>
                 <button id="offer-button" class="btn btn-secondary" onclick="showOfferForm()">Faire une offre</button>
             <?php endif; ?>
@@ -101,7 +107,7 @@ unset($_SESSION['negotiation_message']);
     <?php if (!empty($negotiation_message)): ?>
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <div class="alert alert-info">
+                <div class="alert alert-info text-center">
                     <?php echo htmlspecialchars($negotiation_message); ?>
                 </div>
             </div>
@@ -140,7 +146,9 @@ unset($_SESSION['negotiation_message']);
     <?php endif; ?>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<div class="footer">
+    <?php include '../includes/footer.php'; ?>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
