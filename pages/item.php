@@ -20,6 +20,15 @@ if ($result->num_rows > 0) {
     echo "Produit non trouvé.";
     exit();
 }
+
+// Initialiser le compteur de négociation si non défini
+if (!isset($_SESSION['negotiation_count'])) {
+    $_SESSION['negotiation_count'] = 0;
+}
+
+// Récupérer le message de négociation s'il existe
+$negotiation_message = isset($_SESSION['negotiation_message']) ? $_SESSION['negotiation_message'] : '';
+unset($_SESSION['negotiation_message']);
 ?>
 
 <!DOCTYPE html>
@@ -56,6 +65,10 @@ if ($result->num_rows > 0) {
         .footer {
             margin-top: 50px;
         }
+        .negotiation-form, .offer-form {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +96,18 @@ if ($result->num_rows > 0) {
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Afficher le message de négociation -->
+    <?php if (!empty($negotiation_message)): ?>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="alert alert-info">
+                    <?php echo htmlspecialchars($negotiation_message); ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <div class="row negotiation-form" id="negotiation-form">
         <div class="col-md-6 offset-md-3">
             <form action="submit_negotiation.php" method="post">
