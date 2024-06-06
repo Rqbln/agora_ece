@@ -1,8 +1,6 @@
+# Agora ECE
 
-# Agora
-
-## Description
-Agora est un projet de forum web dynamique conçu pour valider les compétences des élèves sur les technologies web. Le projet inclut des fonctionnalités telles que l'authentification des utilisateurs, la création de sujets de discussion, et les profils utilisateurs.
+Bienvenue sur Agora ECE, la marketplace préférée des électroniciens ! Ce projet permet aux utilisateurs de vendre et d'acheter divers produits électroniques. Voici une description détaillée des fichiers et des fonctionnalités du projet.
 
 ## Technologies Utilisées
 - HTML
@@ -13,93 +11,94 @@ Agora est un projet de forum web dynamique conçu pour valider les compétences 
 - PHP
 - MySQL
 
-## Installation
+## Structure des Fichiers
 
-### Prérequis
-- Serveur web (Apache, Nginx, etc.)
-- PHP 7.0 ou supérieur
-- MySQL
-- Composer (pour la gestion des dépendances PHP)
+### Fichiers Racine
 
-### Étapes d'Installation
-1. Clonez le dépôt :
-    ```bash
-    git clone https://github.com/Rqbln/agora_ece.git
-    ```
-2. Accédez au dossier du projet :
-    ```bash
-    cd agora
-    ```
-3. Installez les dépendances PHP (si nécessaire) :
-    ```bash
-    composer install
-    ```
-4. Créez une base de données MySQL et importez le fichier SQL (si disponible) :
-    ```sql
-    CREATE DATABASE agora;
-    -- Importez votre fichier SQL ici
-    ```
-5. Configurez la connexion à la base de données dans `includes/db.php` :
-    ```php
-    <?php
-    $servername = "localhost";
-    $username = "votre-utilisateur";
-    $password = "votre-motdepasse";
-    $dbname = "agora";
+- **.gitignore** : Spécifie les fichiers et dossiers à ignorer par Git.
+- **delete_product.php** : Script pour supprimer un produit de la base de données.
+- **index.php** : Page d'accueil du site.
+- **init_db.php** : Script pour initialiser la base de données.
+- **init_db.sql** : Script SQL pour créer et initialiser les tables de la base de données.
+- **login.php** : Page de connexion des utilisateurs.
+- **logout.php** : Script pour déconnecter les utilisateurs.
+- **phpinfo.php** : Affiche les informations PHP du serveur.
+- **process_request.php** : Script pour traiter diverses requêtes de l'application.
+- **README.md** : Documentation du projet.
+- **register.php** : Page d'inscription des utilisateurs.
+- **sale.php** : Page pour initier une vente.
+- **submit_ad.php** : Page pour soumettre une annonce.
+- **sujet.pdf** : Sujet du projet.
 
-    // Créez la connexion
-    $conn = new mysqli($servername, $username, $password, $dbname);
+### Dossier `assets`
 
-    // Vérifiez la connexion
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    ?>
-    ```
-6. Lancez le serveur local et accédez au projet via votre navigateur :
-    ```bash
-    php -S localhost:8000
-    ```
-    Ensuite, ouvrez votre navigateur et accédez à `http://localhost:8000`.
+- **css/styles.css** : Styles CSS du site.
+- **img/** : Images utilisées sur le site.
+- **js/** : Scripts JavaScript utilisés sur le site.
 
+### Dossier `includes`
 
-### Détails des Dossiers et Fichiers
+- **db.php** : Configuration pour la connexion à la base de données.
+- **footer.php** : Pied de page.
+- **header.php** : En-tête.
+- **navbar.php** : Barre de navigation.
 
-- **`assets/`** : Contient les ressources statiques du projet.
-   - **`css/`** : Dossier pour les fichiers de styles CSS.
-      - `styles.css` : Fichier principal des styles CSS pour le projet.
-   - **`js/`** : Dossier pour les fichiers JavaScript.
-      - `scripts.js` : Fichier principal des scripts JavaScript pour le projet.
-      - `jquery.min.js` : Fichier jQuery pour les interactions dynamiques.
-   - **`img/`** : Dossier pour les images utilisées dans le projet.
-   - **`fonts/`** : Dossier pour les polices de caractères utilisées dans le projet.
+### Dossier `pages`
 
-- **`includes/`** : Contient les fichiers PHP inclus dans plusieurs pages du site.
-   - `header.php` : Fichier contenant le code HTML commun pour l'en-tête des pages.
-   - `footer.php` : Fichier contenant le code HTML commun pour le pied de page des pages.
-   - `navbar.php` : Fichier contenant le code HTML pour la barre de navigation.
-   - `db.php` : Fichier pour la connexion à la base de données MySQL.
+- **browse.php** : Page pour parcourir les produits disponibles.
+- **cart.php** : Page du panier.
+- **contact.php** : Page de contact.
+- **home.php** : Page d'accueil après connexion.
+- **item.php** : Page de détail d'un produit.
+- **negotiations.php** : Page des négociations.
+- **notifications.php** : Page des notifications.
+- **payment.php** : Page de paiement.
+- **process_negotiation.php** : Script pour traiter une négociation.
+- **process_payment.php** : Script pour traiter un paiement.
+- **process_vendeur.php** : Script pour traiter les actions du vendeur.
+- **profile.php** : Page de profil utilisateur.
+- **seller_negotiations.php** : Page des négociations du vendeur.
+- **seller_space.php** : Espace du vendeur.
+- **submit_negotiation.php** : Page pour soumettre une négociation.
+- **update_profile.php** : Page de mise à jour du profil.
 
-- **`pages/`** : Contient les différentes pages du site.
-   - `home.php` : Page d'accueil du site.
-   - `forum.php` : Page listant les différents sujets de discussion.
-   - `thread.php` : Page affichant les messages d'un sujet spécifique.
-   - `profile.php` : Page de profil utilisateur.
+### Dossier `pages/admin`
 
-- **Fichiers à la racine** :
-   - `index.php` : Page d'accueil principale du site.
-   - `login.php` : Page de connexion pour les utilisateurs existants.
-   - `register.php` : Page d'inscription pour les nouveaux utilisateurs.
-   - `.gitignore` : Fichier spécifiant les fichiers et dossiers à ignorer par Git.
-   - `README.md` : Fichier de documentation du projet.
+- **add_item.php** : Page pour ajouter un produit.
+- **dashboard.php** : Tableau de bord administrateur.
+- **manage_users.php** : Page de gestion des utilisateurs.
 
 ## Fonctionnalités
-- **Accueil :** Page d'accueil du forum.
-- **Forum :** Page listant les différents sujets de discussion.
-- **Sujet :** Page affichant les messages d'un sujet spécifique.
-- **Profil :** Page de profil utilisateur.
-- **Connexion :** Page de connexion pour les utilisateurs existants.
-- **Inscription :** Page d'inscription pour les nouveaux utilisateurs.
+
+### Utilisateurs
+
+- **Inscription** : Les utilisateurs peuvent s'inscrire via `register.php`.
+- **Connexion** : Les utilisateurs peuvent se connecter via `login.php`.
+- **Déconnexion** : Les utilisateurs peuvent se déconnecter via `logout.php`.
+- **Profil** : Les utilisateurs peuvent consulter et mettre à jour leur profil via `profile.php` et `update_profile.php`.
+
+### Produits
+
+- **Ajouter une annonce** : Les utilisateurs peuvent ajouter une annonce via `submit_ad.php`.
+- **Parcourir les produits** : Les utilisateurs peuvent parcourir les produits disponibles via `browse.php`.
+- **Détail du produit** : Les utilisateurs peuvent consulter les détails d'un produit via `item.php`.
+- **Négocier** : Les utilisateurs peuvent négocier le prix des produits via `negotiations.php` et `submit_negotiation.php`.
+
+### Ventes et Paiements
+
+- **Initiation de vente** : Les utilisateurs peuvent initier une vente via `sale.php`.
+- **Paiement** : Les utilisateurs peuvent procéder au paiement via `payment.php` et `process_payment.php`.
+- **Négociations** : Les vendeurs peuvent gérer les négociations via `seller_negotiations.php` et `process_negotiation.php`.
+
+### Administration
+
+- **Tableau de bord** : Les administrateurs peuvent accéder au tableau de bord via `dashboard.php`.
+- **Gestion des utilisateurs** : Les administrateurs peuvent gérer les utilisateurs via `manage_users.php`.
+- **Ajouter un produit** : Les administrateurs peuvent ajouter des produits via `add_item.php`.
+
+## Connexion à la Base de Données
+
+Le fichier `includes/db.php` contient les informations de connexion à la base de données. Assurez-vous de configurer correctement ce fichier pour que l'application puisse interagir avec la base de données.
 
 ## Auteurs
 - Robin Quériaux
